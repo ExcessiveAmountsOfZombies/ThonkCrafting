@@ -1,0 +1,27 @@
+plugins {
+    id 'java'
+}
+
+group 'com.epherical'
+version '1.0.0'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        url = 'https://repo.destroystokyo.com/repository/maven-public'
+    }
+
+    repositories {
+        maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
+    }
+
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
+    implementation "com.destroystokyo.paper:paper-api:1.16.3-R0.1-SNAPSHOT"
+    implementation "com.destroystokyo.paper:paper:1.16.3-R0.1-SNAPSHOT"
+}

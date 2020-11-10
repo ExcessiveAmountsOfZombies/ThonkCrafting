@@ -1,0 +1,9 @@
+name: ThonkCrafting
+main: com.epherical.crafting.ThonkCrafting
+version: "1.0.0"
+author: Thonk
+description: Crafting Plugin that uses NMS registries to create crafting recipes
+api-version: "1.16"
+depend:
+  - ProtocolLib
+load: STARTUP

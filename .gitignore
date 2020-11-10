@@ -1,0 +1,27 @@
+# Class Files #
+bin
+*.class
+*.classpath
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Eclipse Files #
+*.project
+*.jardesc
+*.settings
+
+# OSX #
+*.DS_store
+/target/
+
+# IDEA #
+.idea
+out
+*.iml
+
+# Gradle #
+.gradle
+build
