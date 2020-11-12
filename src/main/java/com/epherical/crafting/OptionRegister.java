@@ -34,13 +34,13 @@ public class OptionRegister {
 
 
     public static void init() {
-        worldCheck = registerOption(createKey("thonkcrafting", "world_check"), WorldCheck::new);
-        permissionCheck = registerOption(createKey("thonkcrafting", "permission_check"), Permission::new);
-        biomeCheck = registerOption(createKey("thonkcrafting", "biome_check"), BiomeCheck::new);
-        cooldownCheck = registerOption(createKey("thonkcrafting", "cooldown_check"), Cooldown::new);
+        worldCheck = registerOption(ThonkCrafting.createKey("thonkcrafting", "world_check"), WorldCheck::new);
+        permissionCheck = registerOption(ThonkCrafting.createKey("thonkcrafting", "permission_check"), Permission::new);
+        biomeCheck = registerOption(ThonkCrafting.createKey("thonkcrafting", "biome_check"), BiomeCheck::new);
+        cooldownCheck = registerOption(ThonkCrafting.createKey("thonkcrafting", "cooldown_check"), Cooldown::new);
 
-        applyPotion = registerOption(createKey("thonkcrafting", "apply_potion"), ApplyPotion::new);
-        playSound = registerOption(createKey("thonkcrafting", "play_sound"), PlaySound::new);
+        applyPotion = registerOption(ThonkCrafting.createKey("thonkcrafting", "apply_potion"), ApplyPotion::new);
+        playSound = registerOption(ThonkCrafting.createKey("thonkcrafting", "play_sound"), PlaySound::new);
 
     }
 
@@ -51,14 +51,7 @@ public class OptionRegister {
     }
 
 
-    public static NamespacedKey createKey(String namespace, String value) {
-        return new NamespacedKey(namespace, value);
-    }
 
-    private static NamespacedKey createKey(String entireKey) {
-        String[] split = entireKey.split(":");
-        return new NamespacedKey(split[0], split[1]);
-    }
 
     public static ArrayList<Options> getOptions(JsonObject object) {
         ArrayList<Options> options = new ArrayList<>();
@@ -67,7 +60,7 @@ public class OptionRegister {
             for (JsonElement element : array) {
                 JsonObject singleOption = element.getAsJsonObject();
                 if (singleOption.has("type")) {
-                    NamespacedKey key = createKey(singleOption.getAsJsonPrimitive("type").getAsString());
+                    NamespacedKey key = ThonkCrafting.createKey(singleOption.getAsJsonPrimitive("type").getAsString());
                     IOption<?> unknownOption = optionMap.get(key);
                     if (unknownOption == null) {
                         throw new JsonSyntaxException("Unknown option type: " + key + " can not finish parsing recipe.");

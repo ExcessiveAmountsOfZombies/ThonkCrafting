@@ -13,11 +13,15 @@ public class ConfigManager {
     private File recipeOverrides;
     private File customRecipes;
 
+
+    private MainConfig mainConfig;
     private RecipeLoader loader;
 
     public ConfigManager(ThonkCrafting plugin) {
         config = new File(plugin.getDataFolder(), "config.json");
         DefaultConfig.createDefaultConfig(plugin, plugin.getGson(), config);
+
+        mainConfig = new MainConfig(config, plugin.getGson());
 
         recipeFolder = new File(plugin.getDataFolder(), "recipes");
 
@@ -28,5 +32,13 @@ public class ConfigManager {
         DefaultConfig.createDefaultFolder(plugin, customRecipes);
 
         loader = new RecipeLoader(recipeFolder, plugin.getGson());
+    }
+
+    public MainConfig getMainConfig() {
+        return mainConfig;
+    }
+
+    public RecipeLoader getLoader() {
+        return loader;
     }
 }

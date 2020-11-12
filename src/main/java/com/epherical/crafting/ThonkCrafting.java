@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.epherical.crafting.api.CustomRecipe;
 import com.epherical.crafting.config.ConfigManager;
+import com.epherical.crafting.config.MainConfig;
 import com.epherical.crafting.listener.RecipeListener;
 import com.epherical.crafting.recipes.impl.RecipeCampfire;
 import com.epherical.crafting.recipes.impl.RecipeShaped;
@@ -31,6 +32,7 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
 
     private ProtocolManager protocolManager;
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static ConfigManager manager;
 
     @Override
     public void onLoad() {
@@ -44,7 +46,7 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         PacketListener.addPacketRecipeListener(protocolManager, this);
         DataPackAdder.addDataPackLocation(this);
         OptionRegister.init();
-        ConfigManager manager = new ConfigManager(this);
+        this.manager = new ConfigManager(this);
         //getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new RecipeListener(), this);
 
@@ -119,5 +121,18 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
 
     public Gson getGson() {
         return gson;
+    }
+
+    public static NamespacedKey createKey(String namespace, String value) {
+        return new NamespacedKey(namespace, value);
+    }
+
+    public static NamespacedKey createKey(String entireKey) {
+        String[] split = entireKey.split(":");
+        return new NamespacedKey(split[0], split[1]);
+    }
+
+    public static MainConfig getMainConfig() {
+        return manager.getMainConfig();
     }
 }
