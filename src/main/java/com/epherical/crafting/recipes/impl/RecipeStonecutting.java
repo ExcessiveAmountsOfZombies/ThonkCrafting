@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeStonecutting;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import org.bukkit.Material;
@@ -12,25 +13,26 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.StonecuttingRecipe;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RecipeStonecutting implements CraftRecipe, CustomRecipe {
     private InternalRecipeStonecutting recipe;
     private StonecuttingRecipe bukkitRecipe;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
     
     
-    public RecipeStonecutting(NamespacedKey key, ItemStack result, Material input, Map<String, Object> options) {
+    public RecipeStonecutting(NamespacedKey key, ItemStack result, Material input, ArrayList<Options> options) {
         this.bukkitRecipe = new StonecuttingRecipe(key, result, input);
         this.options = options;
     }
     
-    public RecipeStonecutting(NamespacedKey key, ItemStack result, RecipeChoice input, Map<String, Object> options) {
+    public RecipeStonecutting(NamespacedKey key, ItemStack result, RecipeChoice input, ArrayList<Options> options) {
         this.bukkitRecipe = new StonecuttingRecipe(key, result, input);
         this.options = options;
     }
 
-    public Map<String, Object> getOptions() {
+    public ArrayList<Options> getOptions() {
         return options;
     }
 
@@ -74,7 +76,7 @@ public class RecipeStonecutting implements CraftRecipe, CustomRecipe {
         MinecraftServer.getServer()
                 .getCraftingManager()
                 .addRecipe(new InternalRecipeStonecutting(CraftNamespacedKey.toMinecraft(this.getKey()),
-                        this.getGroup(), this.toNMS(this.getInputChoice(), true), CraftItemStack.asNMSCopy(result)));
+                        this.getGroup(), this.toNMS(this.getInputChoice(), true), CraftItemStack.asNMSCopy(result), options));
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 
@@ -43,24 +43,23 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         super.onEnable();
         PacketListener.addPacketRecipeListener(protocolManager, this);
         DataPackAdder.addDataPackLocation(this);
+        OptionRegister.init();
         ConfigManager manager = new ConfigManager(this);
         //getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new RecipeListener(), this);
 
         RecipeStonecutting stonecutting = new RecipeStonecutting(new NamespacedKey(this, "baddy"),
-                new ItemStack(Material.IRON_BLOCK), Material.IRON_INGOT, new HashMap<>());
+                new ItemStack(Material.IRON_BLOCK), Material.IRON_INGOT, new ArrayList<>());
         Bukkit.getServer().addRecipe(stonecutting);
 
 
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("hello", "permission");
-        RecipeShaped shaped = new RecipeShaped(new NamespacedKey(this, "hello"), new ItemStack(Material.DIAMOND, 2), map);
+        RecipeShaped shaped = new RecipeShaped(new NamespacedKey(this, "hello"), new ItemStack(Material.DIAMOND, 2), new ArrayList<>());
         shaped.shape("5 5", " 5 ");
         shaped.setIngredient('5', Material.POTATO);
         Bukkit.getServer().addRecipe(shaped);
 
         NamespacedKey key = new NamespacedKey(NamespacedKey.MINECRAFT, "cooked_beef_from_campfire_cooking");
-        RecipeCampfire campfire = new RecipeCampfire(key, new ItemStack(Material.IRON_INGOT), Material.BEEF, 0.5f, 100, new HashMap<>());
+        RecipeCampfire campfire = new RecipeCampfire(key, new ItemStack(Material.IRON_INGOT), Material.BEEF, 0.5f, 100, new ArrayList<>());
         Bukkit.getServer().removeRecipe(key);
         Bukkit.getServer().addRecipe(campfire);
 

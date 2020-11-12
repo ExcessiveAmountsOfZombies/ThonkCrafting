@@ -2,6 +2,7 @@ package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.CraftingRegistry;
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeShapeless;
 import com.google.gson.JsonObject;
 import net.minecraft.server.v1_16_R2.*;
@@ -9,26 +10,27 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Recipe;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
     private ShapelessRecipes recipes;
     private String group;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
 
     public InternalRecipeShapeless(MinecraftKey key, String group, ItemStack itemStack, NonNullList<RecipeItemStack> items,
-                                   Map<String, Object> options) {
+                                   ArrayList<Options> options) {
         this.recipes = new ShapelessRecipes(key, group, itemStack, items);
         this.options = options;
         this.group = group;
     }
 
-    public InternalRecipeShapeless(ShapelessRecipes recipes, String group, Map<String, Object> options) {
+    public InternalRecipeShapeless(ShapelessRecipes recipes, String group, ArrayList<Options> options) {
         this(recipes.getKey(), group, recipes.getResult(), recipes.a(), options);
     }
 
-    public Map<String, Object> getOptions() {
+    public ArrayList<Options> getOptions() {
         return options;
     }
 
@@ -83,13 +85,14 @@ public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
             ShapelessRecipes recipe = RecipeSerializer.b.a(minecraftKey, jsonObject);
             JsonObject object = jsonObject.getAsJsonObject("options");
             map.put("permission", object.getAsJsonPrimitive("permission").getAsString());
-            return new InternalRecipeShapeless(recipe, s, map);
+            // TODO: OPTIONS
+            return new InternalRecipeShapeless(recipe, s, new ArrayList<>());
         }
 
         @Override // client method?
         public InternalRecipeShapeless a(MinecraftKey minecraftKey, PacketDataSerializer packetDataSerializer) {
             ShapelessRecipes recipe = RecipeSerializer.b.a(minecraftKey, packetDataSerializer);
-            return new InternalRecipeShapeless(recipe, "", new HashMap<>());
+            return new InternalRecipeShapeless(recipe, "", new ArrayList<>());
         }
 
         @Override

@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeBlasting;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import org.bukkit.Material;
@@ -12,17 +13,18 @@ import org.bukkit.inventory.BlastingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RecipeBlasting extends AbstractCooking implements CraftRecipe, CustomRecipe {
     private InternalRecipeBlasting recipe;
 
-    public RecipeBlasting(NamespacedKey key, ItemStack result, Material input, float exp, int cookingTime, Map<String, Object> options) {
+    public RecipeBlasting(NamespacedKey key, ItemStack result, Material input, float exp, int cookingTime, ArrayList<Options> options) {
         super(options);
         this.bukkitRecipe = new BlastingRecipe(key, result, input, exp, cookingTime);
     }
 
-    public RecipeBlasting(NamespacedKey key, ItemStack result, RecipeChoice input, float exp, int cookingTime, Map<String, Object> options) {
+    public RecipeBlasting(NamespacedKey key, ItemStack result, RecipeChoice input, float exp, int cookingTime, ArrayList<Options> options) {
         super(options);
         this.bukkitRecipe = new BlastingRecipe(key, result, input, exp, cookingTime);
     }

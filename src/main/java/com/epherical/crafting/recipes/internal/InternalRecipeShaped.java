@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.CraftingRegistry;
+import com.epherical.crafting.OptionRegister;
 import com.epherical.crafting.api.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.options.TestOptions;
@@ -17,21 +18,21 @@ import java.util.stream.Collectors;
 public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
     private ShapedRecipes recipes;
     private String group;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
 
 
     public InternalRecipeShaped(MinecraftKey key, String group, int width, int height, NonNullList<RecipeItemStack> ingredients,
-                                ItemStack result, Map<String, Object> options) {
+                                ItemStack result, ArrayList<Options> options) {
         this.recipes = new ShapedRecipes(key, group, width, height, ingredients, result);
         this.options = options;
         this.group = group;
     }
 
-    public InternalRecipeShaped(ShapedRecipes recipes, String group, Map<String, Object> options) {
+    public InternalRecipeShaped(ShapedRecipes recipes, String group, ArrayList<Options> options) {
         this(recipes.getKey(), group, recipes.i(), recipes.j(), recipes.a(), recipes.getResult(), options);
     }
 
-    public Map<String, Object> getOptions() {
+    public ArrayList<Options> getOptions() {
         return options;
     }
 
@@ -78,12 +79,10 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
 
         @Override
         public InternalRecipeShaped a(MinecraftKey minecraftKey, JsonObject jsonObject) {
-            Map<String, Object> map = new HashMap<>();
             String s = ChatDeserializer.a(jsonObject, "group", "");
             ShapedRecipes recipe = RecipeSerializer.a.a(minecraftKey, jsonObject);
-            JsonObject object = jsonObject.getAsJsonObject("options");
-            map.put("permission", object.getAsJsonPrimitive("permission").getAsString());
-            return new InternalRecipeShaped(recipe, s, map);
+            ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
+            return new InternalRecipeShaped(recipe, s, options);
         }
 
         @Override
@@ -91,7 +90,7 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
             ShapedRecipes recipe = RecipeSerializer.a.a(minecraftKey, packetDataSerializer);
             // no group for a packet because the packet has already been parsed out. this method is probably never used to create
             // a recipe anyways
-            return new InternalRecipeShaped(recipe, "", new HashMap<>());
+            return new InternalRecipeShaped(recipe, "", new ArrayList<>());
         }
 
         @Override

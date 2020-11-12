@@ -1,8 +1,11 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.google.gson.JsonObject;
 import net.minecraft.server.v1_16_R2.*;
+
+import java.util.ArrayList;
 
 public abstract class InternalRecipeSingleItem extends RecipeStonecutting implements CustomRecipe, IRecipe<IInventory> {
     protected final RecipeItemStack ingredient;
@@ -11,10 +14,11 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
     private final RecipeSerializer<?> serializer;
     protected final MinecraftKey key;
     protected final String group;
+    protected final ArrayList<Options> options;
 
     public InternalRecipeSingleItem(Recipes<?> type, RecipeSerializer<?> serializer,
                                     MinecraftKey key, String group,
-                                    RecipeItemStack input, ItemStack output) {
+                                    RecipeItemStack input, ItemStack output, ArrayList<Options> options) {
         super(key, group, input, output);
         this.type = type;
         this.serializer = serializer;
@@ -22,6 +26,7 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
         this.group = group;
         this.ingredient = input;
         this.result = output;
+        this.options = options;
     }
 
     @Override
@@ -51,6 +56,11 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
         return var0;
     }
 
+
+    public ArrayList<Options> getOptions() {
+        return options;
+    }
+
     @Override
     public ItemStack a(IInventory iInventory) {
         return this.result.cloneItemStack();
@@ -59,8 +69,8 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
     public static class SingleItemSerializer<T extends InternalRecipeSingleItem> implements RecipeSerializer<T> {
         private final SingleItemSerializer.a<T> instance;
 
-        public SingleItemSerializer(SingleItemSerializer.a<T> instnace) {
-            this.instance = instnace;
+        public SingleItemSerializer(SingleItemSerializer.a<T> instance) {
+            this.instance = instance;
         }
 
         @Override
@@ -77,7 +87,8 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
             String var4 = ChatDeserializer.h(json, "result");
             int var5 = ChatDeserializer.n(json, "count");
             ItemStack var6 = new ItemStack(IRegistry.ITEM.get(new MinecraftKey(var4)), var5);
-            return this.instance.create(key, var2, var3, var6);
+            // TODO: options
+            return this.instance.create(key, var2, var3, var6, new ArrayList<>());
         }
 
         @Override
@@ -86,7 +97,7 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
             String var2 = packet.e(32767);
             RecipeItemStack var3 = RecipeItemStack.b(packet);
             ItemStack var4 = packet.n();
-            return this.instance.create(key, var2, var3, var4);
+            return this.instance.create(key, var2, var3, var4, new ArrayList<>());
         }
 
         @Override
@@ -98,7 +109,7 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
         }
 
         public interface a<T extends InternalRecipeSingleItem> {
-            T create(MinecraftKey var1, String var2, RecipeItemStack var3, ItemStack var4);
+            T create(MinecraftKey var1, String var2, RecipeItemStack var3, ItemStack var4, ArrayList<Options> options);
         }
     }
 }

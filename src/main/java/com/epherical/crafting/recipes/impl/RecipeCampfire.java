@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeCampfire;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import org.bukkit.Material;
@@ -12,17 +13,18 @@ import org.bukkit.inventory.CampfireRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RecipeCampfire extends AbstractCooking implements CraftRecipe, CustomRecipe {
     private InternalRecipeCampfire recipe;
 
-    public RecipeCampfire(NamespacedKey key, ItemStack result, Material input, float exp, int cookingTime, Map<String, Object> options) {
+    public RecipeCampfire(NamespacedKey key, ItemStack result, Material input, float exp, int cookingTime, ArrayList<Options> options) {
         super(options);
         this.bukkitRecipe = new CampfireRecipe(key, result, input, exp, cookingTime);
     }
 
-    public RecipeCampfire(NamespacedKey key, ItemStack result, RecipeChoice input, float exp, int cookingTime, Map<String, Object> options) {
+    public RecipeCampfire(NamespacedKey key, ItemStack result, RecipeChoice input, float exp, int cookingTime, ArrayList<Options> options) {
         super(options);
         this.bukkitRecipe = new CampfireRecipe(key, result, input, exp, cookingTime);
     }

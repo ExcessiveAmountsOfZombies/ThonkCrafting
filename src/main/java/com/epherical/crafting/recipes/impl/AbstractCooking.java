@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeCooking;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,14 +10,14 @@ import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 public abstract class AbstractCooking implements CraftRecipe, CustomRecipe {
     private InternalRecipeCooking recipe;
     protected CookingRecipe<?> bukkitRecipe;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
 
-    public AbstractCooking(Map<String, Object> options) {
+    public AbstractCooking(ArrayList<Options> options) {
         this.options = options;
     }
 
@@ -73,7 +74,7 @@ public abstract class AbstractCooking implements CraftRecipe, CustomRecipe {
         bukkitRecipe.setGroup(group);
     }
 
-    public Map<String, Object> getOptions() {
+    public ArrayList<Options> getOptions() {
         return options;
     }
 }

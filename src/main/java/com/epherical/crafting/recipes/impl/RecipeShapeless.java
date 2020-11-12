@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeShapeless;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import net.minecraft.server.v1_16_R2.NonNullList;
@@ -20,9 +21,9 @@ import java.util.*;
 public class RecipeShapeless implements CraftRecipe, CustomRecipe {
     private InternalRecipeShapeless recipe;
     private ShapelessRecipe bukkitRecipe;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
 
-    public RecipeShapeless(NamespacedKey key, ItemStack result, Map<String, Object> options) {
+    public RecipeShapeless(NamespacedKey key, ItemStack result, ArrayList<Options> options) {
         this.bukkitRecipe = new ShapelessRecipe(key, result);
         this.options = options;
     }

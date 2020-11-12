@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.CraftingRegistry;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeBlasting;
 import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Material;
@@ -9,11 +10,12 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftRecipe;
 import org.bukkit.craftbukkit.v1_16_R2.util.CraftNamespacedKey;
 import org.bukkit.inventory.Recipe;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class InternalRecipeBlasting extends InternalRecipeCooking {
 
-    public InternalRecipeBlasting(MinecraftKey key, String group, RecipeItemStack input, ItemStack result, float exp, int cookTime, Map<String, Object> options) {
+    public InternalRecipeBlasting(MinecraftKey key, String group, RecipeItemStack input, ItemStack result, float exp, int cookTime, ArrayList<Options> options) {
         super(Recipes.BLASTING, key, group, input, result, exp, cookTime, options);
     }
 

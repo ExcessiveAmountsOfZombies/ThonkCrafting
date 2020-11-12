@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.impl;
 
 import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeShaped;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
 import net.minecraft.server.v1_16_R2.NonNullList;
@@ -15,14 +16,15 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.material.MaterialData;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RecipeShaped implements CraftRecipe, CustomRecipe {
     private InternalRecipeShaped recipe;
     private ShapedRecipe bukkitRecipe;
-    private Map<String, Object> options;
+    private ArrayList<Options> options;
 
-    public RecipeShaped(NamespacedKey key, ItemStack result, Map<String, Object> options) {
+    public RecipeShaped(NamespacedKey key, ItemStack result, ArrayList<Options> options) {
         this.bukkitRecipe = new ShapedRecipe(key, result);
         this.options = options;
     }
@@ -83,7 +85,7 @@ public class RecipeShaped implements CraftRecipe, CustomRecipe {
         bukkitRecipe.setGroup(group);
     }
 
-    public Map<String, Object> getOptions() {
+    public ArrayList<Options> getOptions() {
         return options;
     }
 
