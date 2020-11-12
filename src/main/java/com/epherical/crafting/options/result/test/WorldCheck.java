@@ -2,6 +2,8 @@ package com.epherical.crafting.options.result.test;
 
 import com.epherical.crafting.options.OptionContext;
 import com.epherical.crafting.options.TestOptions;
+import com.google.gson.JsonObject;
+import org.bukkit.NamespacedKey;
 
 public class WorldCheck extends TestOptions {
 
@@ -10,6 +12,11 @@ public class WorldCheck extends TestOptions {
     public WorldCheck(String failMessage, String world) {
         super(failMessage);
         this.world = world;
+    }
+
+    public WorldCheck(NamespacedKey key, JsonObject object) {
+        super(object.getAsJsonPrimitive("fail-message").getAsString());
+        this.world = object.getAsJsonPrimitive("world-to-check").getAsString();
     }
 
     @Override

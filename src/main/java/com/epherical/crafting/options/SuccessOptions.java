@@ -1,5 +1,6 @@
 package com.epherical.crafting.options;
 
+
 public abstract class SuccessOptions extends Options {
 
     public SuccessOptions() {}
