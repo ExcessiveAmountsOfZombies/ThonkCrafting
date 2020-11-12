@@ -2,6 +2,7 @@ package com.epherical.crafting.options.result.test;
 
 import com.epherical.crafting.options.OptionContext;
 import com.epherical.crafting.options.TestOptions;
+import com.epherical.crafting.util.JsonUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -20,9 +21,9 @@ public class BiomeCheck extends TestOptions {
     }
 
     public BiomeCheck(NamespacedKey key, JsonObject object) {
-        super( object.getAsJsonPrimitive("fail-message").getAsString());
+        super(JsonUtil.getValue(object, "fail-message").getAsString());
         ArrayList<String> biomes = new ArrayList<>();
-        JsonArray array = object.getAsJsonArray("biomes");
+        JsonArray array = JsonUtil.getArrayValue(object, "biomes");
         for (JsonElement element : array) {
             biomes.add(element.getAsJsonPrimitive().getAsString().toLowerCase());
         }

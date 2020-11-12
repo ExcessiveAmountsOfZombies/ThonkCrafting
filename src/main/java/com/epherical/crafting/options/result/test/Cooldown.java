@@ -2,6 +2,7 @@ package com.epherical.crafting.options.result.test;
 
 import com.epherical.crafting.options.OptionContext;
 import com.epherical.crafting.options.TestOptions;
+import com.epherical.crafting.util.JsonUtil;
 import com.google.gson.JsonObject;
 import org.bukkit.NamespacedKey;
 
@@ -15,8 +16,8 @@ public class Cooldown extends TestOptions {
     }
 
     public Cooldown(NamespacedKey key, JsonObject object) {
-        super( object.getAsJsonPrimitive("fail-message").getAsString());
-        this.delayInSeconds = object.getAsJsonPrimitive("cooldown-in-seconds").getAsLong();
+        super(JsonUtil.getValue(object, "fail-message").getAsString());
+        this.delayInSeconds = JsonUtil.getValue(object, "cooldown-in-seconds").getAsLong();
     }
 
     @Override

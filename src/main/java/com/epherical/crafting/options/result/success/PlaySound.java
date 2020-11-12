@@ -2,6 +2,7 @@ package com.epherical.crafting.options.result.success;
 
 import com.epherical.crafting.options.OptionContext;
 import com.epherical.crafting.options.SuccessOptions;
+import com.epherical.crafting.util.JsonUtil;
 import com.google.gson.JsonObject;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -19,9 +20,9 @@ public class PlaySound extends SuccessOptions {
     }
 
     public PlaySound(NamespacedKey key, JsonObject object) {
-        this.sound = object.getAsJsonPrimitive("sound").getAsString();
-        this.volume = object.getAsJsonPrimitive("volume").getAsFloat();
-        this.pitch = object.getAsJsonPrimitive("pitch").getAsFloat();
+        this.sound = JsonUtil.getValue(object, "sound").getAsString();
+        this.volume = JsonUtil.getValue(object, "volume").getAsFloat();
+        this.pitch = JsonUtil.getValue(object, "pitch").getAsFloat();
     }
 
     @Override

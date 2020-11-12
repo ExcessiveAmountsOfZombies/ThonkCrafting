@@ -1,7 +1,10 @@
 package com.epherical.crafting.nms;
 
+import com.epherical.crafting.logging.Log;
 import com.google.gson.JsonObject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 
@@ -10,6 +13,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 public class NMS1_16V2 implements NMSInterface {
+
+    private static final Logger LOG_MANAGER = LogManager.getLogger();
+
     private Class<?> craftNamespacedKey;
     private Method toMinecraftKey;
 
@@ -50,21 +56,25 @@ public class NMS1_16V2 implements NMSInterface {
             }
 
             if (addRecipe == null) {
-                // TODO: throw error and stop it all, it wont work
+                LOG_MANAGER.error("Could not find NMS method to add recipe, aborting recipe initialization.");
                 return;
             }
 
             Method deserializeRecipe = craftingClass.getDeclaredMethod("a", minecraftKey, JsonObject.class);
             for (Map.Entry<NamespacedKey, JsonObject> entry : recipes.entrySet()) {
                 // IRecipe<?>
-                Object recipe = deserializeRecipe.invoke(craftingClass, getMinecraftKey(entry.getKey()), entry.getValue());
-                if (recipe != null) {
-                    Bukkit.getServer().removeRecipe(entry.getKey());
-                    addRecipe.invoke(craftManagerClass, recipe);
+                try {
+                    Object recipe = deserializeRecipe.invoke(craftingClass, getMinecraftKey(entry.getKey()), entry.getValue());
+                    if (recipe != null) {
+                        Bukkit.getServer().removeRecipe(entry.getKey());
+                        addRecipe.invoke(craftManagerClass, recipe);
+                    }
+                } catch (InvocationTargetException ex) {
+                    Log.error("Could not parse the recipe {} {}", ex, entry.getKey(), ex.getCause());
                 }
             }
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+            LOG_MANAGER.error("Could not reflect into NMS", e);
         }
     }
 }

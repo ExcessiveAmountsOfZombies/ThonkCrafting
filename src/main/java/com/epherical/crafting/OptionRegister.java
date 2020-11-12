@@ -46,11 +46,7 @@ public class OptionRegister {
 
 
     public static <OPT extends IOption<?>> OPT registerOption(NamespacedKey key, OPT option) {
-        if (optionMap.containsKey(key)) {
-            // TODO: log error duplicate key
-        }
         optionMap.put(key, option);
-
         return option;
     }
 
