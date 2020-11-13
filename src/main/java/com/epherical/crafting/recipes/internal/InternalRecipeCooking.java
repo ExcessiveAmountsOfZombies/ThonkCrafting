@@ -1,16 +1,12 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.OptionRegister;
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
-import com.epherical.crafting.options.SuccessOptions;
-import com.epherical.crafting.options.TestOptions;
 import com.google.gson.JsonObject;
 import net.minecraft.server.v1_16_R2.*;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class InternalRecipeCooking extends RecipeCampfire implements CustomRecipe, IRecipe<IInventory> {
     protected final Recipes<?> recipeType;
@@ -78,18 +74,6 @@ public abstract class InternalRecipeCooking extends RecipeCampfire implements Cu
 
     public ArrayList<Options> getOptions() {
         return options;
-    }
-
-    public List<TestOptions> getTestOptions() {
-        return options.stream()
-                .filter(options1 -> options1 instanceof TestOptions)
-                .map(options1 -> (TestOptions) options1).collect(Collectors.toList());
-    }
-
-    public List<SuccessOptions> getSuccessOptions() {
-        return options.stream()
-                .filter(options1 -> options1 instanceof SuccessOptions)
-                .map(options1 -> (SuccessOptions) options1).collect(Collectors.toList());
     }
 
     public static class CookingSerializer<T extends InternalRecipeCooking> implements RecipeSerializer<T> {

@@ -1,7 +1,8 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.CraftingRegistry;
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.OptionRegister;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeShapeless;
 import com.google.gson.JsonObject;
@@ -11,8 +12,6 @@ import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Recipe;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
     private ShapelessRecipes recipes;
@@ -80,13 +79,10 @@ public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
 
         @Override
         public InternalRecipeShapeless a(MinecraftKey minecraftKey, JsonObject jsonObject) {
-            Map<String, Object> map = new HashMap<>();
             String s = ChatDeserializer.a(jsonObject, "group", "");
             ShapelessRecipes recipe = RecipeSerializer.b.a(minecraftKey, jsonObject);
-            JsonObject object = jsonObject.getAsJsonObject("options");
-            map.put("permission", object.getAsJsonPrimitive("permission").getAsString());
-            // TODO: OPTIONS
-            return new InternalRecipeShapeless(recipe, s, new ArrayList<>());
+            ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
+            return new InternalRecipeShapeless(recipe, s, options);
         }
 
         @Override // client method?

@@ -1,6 +1,6 @@
 package com.epherical.crafting.recipes.impl;
 
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeShapeless;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
@@ -157,5 +157,10 @@ public class RecipeShapeless implements CraftRecipe, CustomRecipe {
     @Override
     public Material getRelevantMaterial() {
         return null;
+    }
+
+    @Override
+    public ArrayList<Options> getOptions() {
+        return options;
     }
 }

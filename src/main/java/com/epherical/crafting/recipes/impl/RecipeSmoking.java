@@ -1,6 +1,6 @@
 package com.epherical.crafting.recipes.impl;
 
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeSmoking;
 import net.minecraft.server.v1_16_R2.MinecraftServer;
@@ -14,7 +14,6 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.SmokingRecipe;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class RecipeSmoking extends AbstractCooking implements CraftRecipe, CustomRecipe {
     private InternalRecipeSmoking recipe;

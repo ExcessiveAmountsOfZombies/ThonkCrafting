@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.internal;
 
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.OptionRegister;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.google.gson.JsonObject;
 import net.minecraft.server.v1_16_R2.*;
@@ -87,8 +88,8 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
             String var4 = ChatDeserializer.h(json, "result");
             int var5 = ChatDeserializer.n(json, "count");
             ItemStack var6 = new ItemStack(IRegistry.ITEM.get(new MinecraftKey(var4)), var5);
-            // TODO: options
-            return this.instance.create(key, var2, var3, var6, new ArrayList<>());
+            ArrayList<Options> options = OptionRegister.getOptions(json);
+            return this.instance.create(key, var2, var3, var6, options);
         }
 
         @Override

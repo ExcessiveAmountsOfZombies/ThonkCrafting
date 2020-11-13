@@ -1,6 +1,6 @@
 package com.epherical.crafting.recipes.impl;
 
-import com.epherical.crafting.api.CustomRecipe;
+import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeShaped;
 import net.minecraft.server.v1_16_R2.MinecraftServer;

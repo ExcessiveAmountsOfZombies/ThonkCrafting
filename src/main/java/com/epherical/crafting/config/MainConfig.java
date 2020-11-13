@@ -1,6 +1,8 @@
 package com.epherical.crafting.config;
 
+import com.epherical.crafting.ThonkCrafting;
 import com.google.gson.*;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 
 import java.io.*;
@@ -18,29 +20,32 @@ public class MainConfig {
         this.configFile = file;
         this.GSON = gson;
 
-        checkDefaults();
-        readFile();
+        // If something was deleted we'll add it back
+        readConfigAndFixDefaults();
     }
 
-    private void checkDefaults() {
+    private void readConfigAndFixDefaults() {
         try (Reader reader = new FileReader(configFile)) {
             JsonObject main = GSON.fromJson(reader, JsonObject.class);
 
             addDefaultIfNotPresent(main, "debug", new JsonPrimitive(false));
             addDefaultIfNotPresent(main, "removed-recipes", new JsonArray());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void readFile() {
-        try (Reader reader = new FileReader(configFile)) {
-            JsonObject config = GSON.fromJson(reader, JsonObject.class);
-            debugEnabled = config.getAsJsonPrimitive("debug").getAsBoolean();
-            for (JsonElement element : config.getAsJsonArray("removed-recipes")) {
+            debugEnabled = main.getAsJsonPrimitive("debug").getAsBoolean();
+            for (JsonElement element : main.getAsJsonArray("removed-recipes")) {
                 if (element.isJsonPrimitive()) {
-
+                    String recipe = element.getAsString();
+                    NamespacedKey key = ThonkCrafting.createKey(recipe);
+                    if (key != null) {
+                        removedRecipes.add(key);
+                    }
                 }
+            }
+            // TODO: something different
+            removedRecipes.forEach(Bukkit::removeRecipe);
+
+            try (Writer writer = new FileWriter(configFile)) {
+                GSON.toJson(main, writer);
             }
         } catch (IOException e) {
             e.printStackTrace();
