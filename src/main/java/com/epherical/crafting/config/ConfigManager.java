@@ -31,7 +31,7 @@ public class ConfigManager {
         DefaultConfig.createDefaultFolder(plugin, recipeOverrides);
         DefaultConfig.createDefaultFolder(plugin, customRecipes);
 
-        loader = new RecipeLoader(recipeFolder, plugin.getGson());
+        loader = new RecipeLoader(recipeFolder, plugin.getGson(), plugin.getNmsInterface());
     }
 
     public MainConfig getMainConfig() {

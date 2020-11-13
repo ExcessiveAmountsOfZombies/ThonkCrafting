@@ -1,6 +1,5 @@
 package com.epherical.crafting.config;
 
-import com.epherical.crafting.nms.NMS1_16V2;
 import com.epherical.crafting.nms.NMSInterface;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -15,16 +14,12 @@ import java.util.Map;
 public class RecipeLoader {
     private final File recipeFolder;
     private final Gson GSON;
-    private NMSInterface nmsInterface;
+    private final NMSInterface nmsInterface;
 
-    public RecipeLoader(File recipeFolder, Gson gson) {
+    public RecipeLoader(File recipeFolder, Gson gson, NMSInterface nmsInterface) {
         this.recipeFolder = recipeFolder;
         this.GSON = gson;
-        try {
-            nmsInterface = new NMS1_16V2();
-        } catch (ClassNotFoundException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
+        this.nmsInterface = nmsInterface;
 
         loadRecipeFolders();
     }

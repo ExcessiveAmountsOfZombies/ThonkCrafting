@@ -3,10 +3,17 @@ package com.epherical.crafting.nms;
 import com.epherical.crafting.logging.Log;
 import com.google.gson.JsonObject;
 
+import net.minecraft.server.v1_16_R2.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.*;
+import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R2.block.CraftBlockEntityState;
+import org.bukkit.inventory.CookingRecipe;
+import org.bukkit.inventory.Recipe;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,6 +44,7 @@ public class NMS1_16V2 implements NMSInterface {
         return null;
     }
 
+    @Override
     public void registerRecipes(Map<NamespacedKey, JsonObject> recipes) {
         try {
             Class<?> craftingClass = Class.forName("net.minecraft.server.v1_16_R2.CraftingManager");
@@ -76,5 +84,28 @@ public class NMS1_16V2 implements NMSInterface {
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             LOG_MANAGER.error("Could not reflect into NMS", e);
         }
+    }
+
+
+    public Recipe getCookingRecipeFromIngredient(TileState block, World world) {
+        // TODO: reflection or somehow get API this is bad
+
+        CraftingManager manager = MinecraftServer.getServer().getCraftingManager();
+        IRecipe<?> recipes = null;
+        /*if (block instanceof Campfire) {
+            CraftBlockEntityState<TileEntityCampfire> tile = (CraftBlockEntityState<TileEntityCampfire>) block;
+            recipes = manager.craft(Recipes.CAMPFIRE_COOKING, tile.getTileEntity()., ((CraftWorld) world).getHandle()).orElse(null);
+        }*/ if (block instanceof BlastFurnace) {
+            CraftBlockEntityState<TileEntityBlastFurnace> tile = (CraftBlockEntityState<TileEntityBlastFurnace>) block;
+            recipes = manager.craft(Recipes.BLASTING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+        } else if (block instanceof Smoker) {
+            CraftBlockEntityState<TileEntitySmoker> tile = (CraftBlockEntityState<TileEntitySmoker>) block;
+            recipes = manager.craft(Recipes.SMOKING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+        } else if (block instanceof Furnace) {
+            CraftBlockEntityState<TileEntityFurnaceFurnace> tile = (CraftBlockEntityState<TileEntityFurnaceFurnace>) block;
+            recipes = manager.craft(Recipes.SMELTING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+        }
+
+        return recipes != null ? recipes.toBukkitRecipe() : null;
     }
 }

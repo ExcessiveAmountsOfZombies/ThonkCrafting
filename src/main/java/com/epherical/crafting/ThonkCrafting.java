@@ -6,6 +6,8 @@ import com.epherical.crafting.config.ConfigManager;
 import com.epherical.crafting.config.MainConfig;
 import com.epherical.crafting.listener.CookingBlockListener;
 import com.epherical.crafting.listener.RecipeListener;
+import com.epherical.crafting.nms.NMS1_16V2;
+import com.epherical.crafting.nms.NMSInterface;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.bukkit.NamespacedKey;
@@ -20,6 +22,8 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static ConfigManager manager;
 
+    private NMSInterface nmsInterface;
+
     @Override
     public void onLoad() {
         CraftingRegistry.init();
@@ -29,12 +33,17 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         super.onEnable();
+        try {
+            nmsInterface = new NMS1_16V2();
+        } catch (ClassNotFoundException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
         PacketListener.addPacketRecipeListener(protocolManager, this);
         DataPackAdder.addDataPackLocation(this);
         OptionRegister.init();
         manager = new ConfigManager(this);
         //getServer().getPluginManager().registerEvents(this, this);
-        getServer().getPluginManager().registerEvents(new RecipeListener(), this);
+        getServer().getPluginManager().registerEvents(new RecipeListener(this), this);
         getServer().getPluginManager().registerEvents(new CookingBlockListener(this), this);
 
     }
@@ -59,5 +68,9 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
 
     public static MainConfig getMainConfig() {
         return manager.getMainConfig();
+    }
+
+    public NMSInterface getNmsInterface() {
+        return nmsInterface;
     }
 }
