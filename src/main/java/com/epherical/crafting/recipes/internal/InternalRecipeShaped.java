@@ -6,8 +6,8 @@ import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeShaped;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_16_R2.*;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 
 import java.util.ArrayList;
 

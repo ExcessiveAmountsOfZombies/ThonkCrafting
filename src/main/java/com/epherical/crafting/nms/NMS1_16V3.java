@@ -3,23 +3,24 @@ package com.epherical.crafting.nms;
 import com.epherical.crafting.logging.Log;
 import com.google.gson.JsonObject;
 
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.block.*;
-import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R2.block.CraftBlockEntityState;
-import org.bukkit.inventory.CookingRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlockEntityState;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.Recipe;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Map;
 
-public class NMS1_16V2 implements NMSInterface {
+public class NMS1_16V3 implements NMSInterface {
 
     private static final Logger LOG_MANAGER = LogManager.getLogger();
 
@@ -28,8 +29,8 @@ public class NMS1_16V2 implements NMSInterface {
 
 
 
-    public NMS1_16V2() throws ClassNotFoundException, NoSuchMethodException {
-        this.craftNamespacedKey = Class.forName("org.bukkit.craftbukkit.v1_16_R2.util.CraftNamespacedKey");
+    public NMS1_16V3() throws ClassNotFoundException, NoSuchMethodException {
+        this.craftNamespacedKey = Class.forName("org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey");
         this.toMinecraftKey = craftNamespacedKey.getMethod("toMinecraft", NamespacedKey.class);
     }
 
@@ -47,10 +48,10 @@ public class NMS1_16V2 implements NMSInterface {
     @Override
     public void registerRecipes(Map<NamespacedKey, JsonObject> recipes) {
         try {
-            Class<?> craftingClass = Class.forName("net.minecraft.server.v1_16_R2.CraftingManager");
-            Class<?> minecraftKey = Class.forName("net.minecraft.server.v1_16_R2.MinecraftKey");
-            Class<?> serverClass = Class.forName("net.minecraft.server.v1_16_R2.MinecraftServer");
-            Class<?> iRecipe = Class.forName("net.minecraft.server.v1_16_R2.IRecipe");
+            Class<?> craftingClass = Class.forName("net.minecraft.server.v1_16_R3.CraftingManager");
+            Class<?> minecraftKey = Class.forName("net.minecraft.server.v1_16_R3.MinecraftKey");
+            Class<?> serverClass = Class.forName("net.minecraft.server.v1_16_R3.MinecraftServer");
+            Class<?> iRecipe = Class.forName("net.minecraft.server.v1_16_R3.IRecipe");
             // MinecraftServer object
             Object minecraftServer = serverClass.getMethod("getServer").invoke(serverClass);
             Object craftManagerClass = null;
@@ -107,5 +108,14 @@ public class NMS1_16V2 implements NMSInterface {
         }
 
         return recipes != null ? recipes.toBukkitRecipe() : null;
+    }
+
+    public ArrayList<NamespacedKey> getRecipeKeys() {
+        // TODO: reflection i guess lazy
+        ArrayList<NamespacedKey> keys = new ArrayList<>();
+        MinecraftServer.getServer().getCraftingManager().b().forEach(iRecipe -> {
+            keys.add(CraftNamespacedKey.fromMinecraft(iRecipe.getKey()));
+        });
+        return keys;
     }
 }

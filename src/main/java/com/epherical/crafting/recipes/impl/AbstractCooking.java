@@ -5,7 +5,7 @@ import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeCooking;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftRecipe;
 import org.bukkit.inventory.CookingRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;

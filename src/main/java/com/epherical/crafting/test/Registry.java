@@ -2,8 +2,8 @@ package com.epherical.crafting.test;
 
 import com.epherical.crafting.test.nms.InternalDamageDurabilityRecipe;
 import com.epherical.crafting.test.nms.InternalPermissionRecipe;
-import net.minecraft.server.v1_16_R2.MinecraftKey;
-import net.minecraft.server.v1_16_R2.RegistryMaterials;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.RegistryMaterials;
 
 public class Registry {
 

@@ -7,6 +7,7 @@ import org.bukkit.block.Furnace;
 import org.bukkit.block.TileState;
 import org.bukkit.inventory.Recipe;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public interface NMSInterface {
@@ -16,4 +17,6 @@ public interface NMSInterface {
     void registerRecipes(Map<NamespacedKey, JsonObject> map);
 
     Recipe getCookingRecipeFromIngredient(TileState furnace, World world);
+
+    ArrayList<NamespacedKey> getRecipeKeys();
 }

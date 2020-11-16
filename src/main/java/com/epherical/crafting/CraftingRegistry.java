@@ -1,7 +1,7 @@
 package com.epherical.crafting;
 
 import com.epherical.crafting.recipes.internal.*;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R3.*;
 
 public class CraftingRegistry {
 

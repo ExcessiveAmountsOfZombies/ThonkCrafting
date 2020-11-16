@@ -7,3 +7,6 @@ api-version: "1.16"
 depend:
   - ProtocolLib
 load: POSTWORLD
+commands:
+  bingo:
+    usage: yeet

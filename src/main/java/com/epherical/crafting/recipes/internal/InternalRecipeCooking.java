@@ -4,7 +4,7 @@ import com.epherical.crafting.OptionRegister;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.google.gson.JsonObject;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R3.*;
 
 import java.util.ArrayList;
 

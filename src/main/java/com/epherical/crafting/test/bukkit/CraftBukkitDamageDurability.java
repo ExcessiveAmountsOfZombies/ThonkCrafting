@@ -2,13 +2,13 @@ package com.epherical.crafting.test.bukkit;
 
 import com.epherical.crafting.test.api.DamageDurabilityRecipe;
 import com.epherical.crafting.test.nms.InternalDamageDurabilityRecipe;
-import net.minecraft.server.v1_16_R2.MinecraftServer;
-import net.minecraft.server.v1_16_R2.NonNullList;
-import net.minecraft.server.v1_16_R2.RecipeItemStack;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.NonNullList;
+import net.minecraft.server.v1_16_R3.RecipeItemStack;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_16_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 

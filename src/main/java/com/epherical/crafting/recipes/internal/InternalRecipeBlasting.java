@@ -3,11 +3,11 @@ package com.epherical.crafting.recipes.internal;
 import com.epherical.crafting.CraftingRegistry;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeBlasting;
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftRecipe;
-import org.bukkit.craftbukkit.v1_16_R2.util.CraftNamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.Recipe;
 
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ public class InternalRecipeBlasting extends InternalRecipeCooking {
 
     @Override
     public IRecipe<?> getVanillaRecipe() {
-        return new net.minecraft.server.v1_16_R2.RecipeBlasting(key, group, input, output, experience, cookingTime);
+        return new net.minecraft.server.v1_16_R3.RecipeBlasting(key, group, input, output, experience, cookingTime);
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.epherical.crafting.recipes.CustomRecipe;
-import net.minecraft.server.v1_16_R2.IRecipe;
+import net.minecraft.server.v1_16_R3.IRecipe;
 
 import java.util.ArrayList;
 
