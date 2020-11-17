@@ -6,6 +6,7 @@ import com.epherical.crafting.commands.RecipeCommand;
 import com.epherical.crafting.config.ConfigManager;
 import com.epherical.crafting.config.MainConfig;
 import com.epherical.crafting.listener.CookingBlockListener;
+import com.epherical.crafting.listener.InventoryListener;
 import com.epherical.crafting.listener.RecipeListener;
 import com.epherical.crafting.nms.NMS1_16V3;
 import com.epherical.crafting.nms.NMSInterface;
@@ -46,8 +47,11 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         //getServer().getPluginManager().registerEvents(this, this);
         getServer().getPluginManager().registerEvents(new RecipeListener(this), this);
         getServer().getPluginManager().registerEvents(new CookingBlockListener(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
 
-        getCommand("bingo").setExecutor(new RecipeCommand(this));
+        RecipeCommand command = new RecipeCommand(this);
+        getCommand("bingo").setExecutor(command);
+        getCommand("bingo").setTabCompleter(command);
 
     }
 
