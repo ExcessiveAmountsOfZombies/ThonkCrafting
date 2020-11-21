@@ -6,11 +6,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 
 public class MenuDefaults {
 
-    public static MenuButton[] createBorder(Material borderMaterial, int rows) {
+   /* public static MenuButton[] createBorder(Material borderMaterial, int rows) {
         int size = rows * 9;
         ArrayList<MenuButton> buttons = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -19,7 +18,7 @@ public class MenuDefaults {
             }
         }
         return buttons.toArray(new MenuButton[]{});
-    }
+    }*/
 
     public static MenuButton closeButton(Material material, int slot) {
         return closeButton(new ItemStack(material), slot);
@@ -29,7 +28,7 @@ public class MenuDefaults {
         return new MenuButton(event -> {
             event.setCancelled(true);
             event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
-        }, slot, itemStack);
+        }, itemStack);
     }
 
     public static MenuButton defaultCloseButton(int slot) {
@@ -40,6 +39,6 @@ public class MenuDefaults {
         return new MenuButton(event -> {
             event.setCancelled(true);
             event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
-        }, slot, itemStack);
+        }, itemStack);
     }
 }

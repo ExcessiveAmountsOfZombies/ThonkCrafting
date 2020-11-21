@@ -73,7 +73,7 @@ public class Menu implements InventoryHolder {
             this.buttons = new HashMap<>();
             if (fillEmptySlots) {
                 for (int i = 0; i < rows * 9; i++) {
-                    buttons.put(i, new MenuButton(event -> event.setCancelled(true), i, fillMaterial));
+                    buttons.put(i, new MenuButton(event -> event.setCancelled(true), fillMaterial));
                 }
             }
         }
@@ -100,7 +100,6 @@ public class Menu implements InventoryHolder {
 
         public Builder addMenuButtons(MenuButton button, int... slots) {
             for (int slot : slots) {
-                button.setSlot(slot);
                 this.buttons.put(slot, button);
             }
             return this;

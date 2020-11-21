@@ -1,8 +1,10 @@
 package com.epherical.crafting.nms;
 
 import com.epherical.crafting.logging.Log;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.v1_16_R3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,10 +17,13 @@ import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlockEntityState;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.inventory.Recipe;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class NMS1_16V3 implements NMSInterface {
 
@@ -117,5 +122,88 @@ public class NMS1_16V3 implements NMSInterface {
             keys.add(CraftNamespacedKey.fromMinecraft(iRecipe.getKey()));
         });
         return keys;
+    }
+
+    @Override // RecipeItemStack Replicates  public static RecipeItemStack a(@Nullable JsonElement jsonelement)
+    public Object createRecipeChoice(JsonElement jsonElement) {
+        if (jsonElement != null && !jsonElement.isJsonNull()) {
+            if (jsonElement.isJsonObject()) {
+                return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())));
+            } else if (jsonElement.isJsonArray()) {
+                JsonArray jsonarray = jsonElement.getAsJsonArray();
+                if (jsonarray.size() == 0) {
+                    throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
+                } else {
+                    return constructRecipeItemStack(StreamSupport.stream(jsonarray.spliterator(), false).map((element) -> createRecipeProvider(ChatDeserializer.m(element, "item"))));
+                }
+            } else {
+                throw new JsonSyntaxException("Expected item to be object or array of objects");
+            }
+        } else {
+            throw new JsonSyntaxException("Item cannot be null");
+        }
+    }
+
+    @Override // RecipeItemStack.Provider
+    public Object createRecipeProvider(JsonObject object) {
+        if (object.has("item") && object.has("tag")) {
+            throw new JsonParseException("An ingredient entry is either a tag or an item, not both");
+        } else {
+            MinecraftKey minecraftkey;
+            if (object.has("item")) {
+                ItemStack item = (ItemStack) createNMSItemStack(object);
+                return new RecipeItemStack.StackProvider(item);
+            } else if (object.has("tag")) {
+                minecraftkey = new MinecraftKey(ChatDeserializer.h(object, "tag"));
+                Tag<Item> tag = TagsInstance.a().getItemTags().a(minecraftkey);
+                if (tag == null) {
+                    throw new JsonSyntaxException("Unknown item tag '" + minecraftkey + "'");
+                } else {
+                    Object instance = null;
+                    try {
+                        Class<?> clazz = Class.forName("net.minecraft.server.v1_16_R3.RecipeItemStack.b");
+                        Constructor<?> constructor = clazz.getDeclaredConstructor(Tag.class);
+                        constructor.setAccessible(true);
+                        instance = constructor.newInstance(tag);
+                    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                    return instance;
+                }
+            } else {
+                throw new JsonParseException("An ingredient entry needs either a tag or an item");
+            }
+        }
+    }
+
+
+    @Override // NMS ItemStack
+    public Object createNMSItemStack(JsonObject jsonObject) {
+        String s = ChatDeserializer.h(jsonObject, "item");
+        Item item = IRegistry.ITEM.getOptional(new MinecraftKey(s)).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + s + "'"));
+        ItemStack itemStack = new ItemStack(item);
+        if (jsonObject.has("data")) {
+            try {
+                NBTTagCompound compound = new MojangsonParser(new StringReader(jsonObject.get("data").getAsString())).f();
+                itemStack.save(compound);
+            } catch (CommandSyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        return itemStack;
+    }
+
+    @Override // Access to private RecipeItemStack constructor
+    public Object constructRecipeItemStack(Stream<?> object) {
+        Object recipeItemStack = null;
+        try {
+            Class<?> clazz = Class.forName("net.minecraft.server.v1_16_R3.RecipeItemStack");
+            Method method = clazz.getDeclaredMethod("b", Stream.class);
+            method.setAccessible(true);
+            recipeItemStack = method.invoke(clazz, object);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return recipeItemStack;
     }
 }

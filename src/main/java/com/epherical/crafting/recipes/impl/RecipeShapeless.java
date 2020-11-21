@@ -30,6 +30,12 @@ public class RecipeShapeless implements CraftRecipe, CustomRecipe {
 
     public RecipeShapeless(ItemStack result, InternalRecipeShapeless recipe) {
         this(CraftNamespacedKey.fromMinecraft(recipe.getKey()), result, recipe.getOptions());
+
+        bukkitRecipe.setGroup(recipe.getGroup());
+        for (RecipeItemStack itemStack : recipe.a()) {
+            bukkitRecipe.addIngredient(CraftRecipe.toBukkit(itemStack));
+        }
+
         this.recipe = recipe;
     }
     

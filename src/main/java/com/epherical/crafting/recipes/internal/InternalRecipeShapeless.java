@@ -6,6 +6,7 @@ import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeShapeless;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.StringReader;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -74,6 +75,13 @@ public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
         return new RecipeShapeless(result, this);
     }
 
+    public NonNullList<RecipeItemStack> a() {
+        return this.recipes.a();
+    }
+
+    public String getGroup() {
+        return group;
+    }
 
     public static class ShapelessSerializer implements RecipeSerializer<InternalRecipeShapeless> {
 

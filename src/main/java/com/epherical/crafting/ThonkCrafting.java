@@ -24,7 +24,7 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static ConfigManager manager;
 
-    private NMSInterface nmsInterface;
+    private static NMSInterface nmsInterface;
 
     @Override
     public void onLoad() {
@@ -77,7 +77,7 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         return manager.getMainConfig();
     }
 
-    public NMSInterface getNmsInterface() {
+    public static NMSInterface getNmsInterface() {
         return nmsInterface;
     }
 }
