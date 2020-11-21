@@ -30,4 +30,9 @@ public class PlaySound extends SuccessOptions {
         Location location = context.getPlayer().getLocation();
         context.getPlayer().playSound(location, sound, volume, pitch);
     }
+
+    @Override
+    public String toString() {
+        return "Will play sound: " + sound + " at " + volume + " volume and " + pitch + " pitch";
+    }
 }

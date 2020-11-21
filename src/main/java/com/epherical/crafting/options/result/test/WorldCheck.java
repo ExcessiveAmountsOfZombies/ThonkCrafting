@@ -4,6 +4,9 @@ import com.epherical.crafting.options.OptionContext;
 import com.epherical.crafting.options.TestOptions;
 import com.epherical.crafting.util.JsonUtil;
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.NamespacedKey;
 
 public class WorldCheck extends TestOptions {
@@ -23,5 +26,17 @@ public class WorldCheck extends TestOptions {
     @Override
     public boolean test(OptionContext context) {
         return context.getPlayer().getWorld().getName().equalsIgnoreCase(world);
+    }
+
+    @Override
+    public String toString() {
+        return "World required to craft this item: " + world;
+    }
+
+    @Override
+    public BaseComponent[] textDisplay() {
+        ComponentBuilder builder = new ComponentBuilder("World required to be in to craft this item: ").color(ChatColor.DARK_GRAY).italic(false);
+        builder.append(world).color(ChatColor.GRAY).italic(false);
+        return builder.create();
     }
 }
