@@ -1,9 +1,13 @@
 package com.epherical.crafting.commands;
 
 import com.epherical.crafting.ThonkCrafting;
+import com.epherical.crafting.recipes.CustomRecipe;
+import com.epherical.crafting.recipes.impl.*;
 import com.epherical.crafting.ui.Menu;
 import com.epherical.crafting.ui.MenuDefaults;
 import com.epherical.crafting.ui.click.MenuButton;
+import com.epherical.crafting.util.ItemUtil;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -35,7 +39,6 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (commandSender instanceof Player) {
-            Player player = (Player) commandSender;
             NamespacedKey key = ThonkCrafting.createKey(args[0]);
 
             Recipe recipe = Bukkit.getRecipe(key);
@@ -43,83 +46,10 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
                 return false;
             }
 
-            if (recipe instanceof ShapedRecipe) {
-                createCraftingMenu(shapedRecipeMenu((ShapedRecipe) recipe), commandSender, recipe.getResult());
-            } else if (recipe instanceof ShapelessRecipe) {
-                createCraftingMenu(shapelessRecipeMenu((ShapelessRecipe) recipe), commandSender, recipe.getResult());
-            } else if (recipe instanceof CookingRecipe) {
-                CookingRecipe<?> cookingRecipe = (CookingRecipe<?>) recipe;
-                createCookingMenu(cookingRecipe.getInput(), cookingRecipe.getResult(), commandSender);
-            }
 
         }
 
         return true;
-    }
-
-    private Map<Integer, MenuButton> shapelessRecipeMenu(ShapelessRecipe recipe) {
-        int firstSlot = 11;
-        int slotRow = 0;
-        int i = 0;
-        Map<Integer, MenuButton> displayedIngredients = new HashMap<>();
-        for (ItemStack itemStack : recipe.getIngredientList()) {
-            int slot = firstSlot+(slotRow*9)+i;
-            displayedIngredients.put(slot, new MenuButton(event -> event.setCancelled(true), slot, itemStack));
-            if (i % 2 == 0) {
-                slotRow++;
-                i = 0;
-            }
-            i++;
-        }
-        return displayedIngredients;
-    }
-
-
-    private Map<Integer, MenuButton> shapedRecipeMenu(ShapedRecipe recipe) {
-        Map<Character, ItemStack> ingredients = recipe.getIngredientMap();
-        Map<Integer, MenuButton> displayedIngredients = new HashMap<>();
-        String[] shape = recipe.getShape();
-        int firstSlot = 11;
-        int slotRow = 0;
-        for (String row : shape) {
-            for (int i = 0; i < row.toCharArray().length; i++) {
-                ItemStack item = ingredients.get(row.toCharArray()[i]);
-                int slot = firstSlot+(slotRow*9)+i;
-                displayedIngredients.put(slot, new MenuButton(event -> event.setCancelled(true), slot, item));
-            }
-            slotRow++;
-        }
-        return displayedIngredients;
-    }
-
-
-
-    private void createCraftingMenu(Map<Integer, MenuButton> displayedIngredients, CommandSender sender, ItemStack result) {
-        Menu.Builder builder = new Menu.Builder(6, "Crafting Menu", true, Material.BLACK_STAINED_GLASS_PANE)
-                .addMenuButton(24, new MenuButton(event -> event.setCancelled(true), 24, result))
-                .addMenuButton(37, MenuDefaults.defaultCloseButton(37))
-                .addMenuButton(38, new MenuButton(event -> event.setCancelled(true), 38, Material.PAPER))
-                .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), 39, Material.COMMAND_BLOCK))
-                .addMenuButton(42, new MenuButton(event -> event.setCancelled(true), 42, Material.PRISMARINE_SHARD))
-                .addMenuButton(43, new MenuButton(event -> event.setCancelled(true), 43, Material.FEATHER))
-                .addMenuButtons(new MenuButton(event -> event.setCancelled(true), 0, Material.AIR), 11, 12, 13, 20, 21, 22, 29, 30, 31)
-                .addMenuButtons(displayedIngredients);
-        Menu menu = builder.build();
-        menu.openInventory((HumanEntity) sender);
-    }
-
-    private void createCookingMenu(ItemStack input, ItemStack result, CommandSender sender) {
-        Menu.Builder builder = new Menu.Builder(6, "Cooking Menu", true, Material.BLACK_STAINED_GLASS_PANE)
-                .addMenuButton(24, new MenuButton(event -> event.setCancelled(true), 24, result))
-                .addMenuButton(37, MenuDefaults.defaultCloseButton(37))
-                .addMenuButton(38, new MenuButton(event -> event.setCancelled(true), 38, Material.PAPER))
-                .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), 39, Material.COMMAND_BLOCK))
-                .addMenuButton(42, new MenuButton(event -> event.setCancelled(true), 42, Material.PRISMARINE_SHARD))
-                .addMenuButton(43, new MenuButton(event -> event.setCancelled(true), 43, Material.FEATHER))
-                .addMenuButton(12, new MenuButton(event -> event.setCancelled(true), 12, input))
-                .addMenuButton(30, new MenuButton(event -> event.setCancelled(true), 30, Material.LAVA_BUCKET));
-        Menu menu = builder.build();
-        menu.openInventory((HumanEntity) sender);
     }
 
     @Override
