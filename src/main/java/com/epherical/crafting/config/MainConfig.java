@@ -13,8 +13,8 @@ public class MainConfig {
     private final Gson GSON;
     private final File configFile;
 
-    private boolean debugEnabled;
-    private ArrayList<NamespacedKey> removedRecipes = new ArrayList<>();
+    private static boolean debugEnabled;
+    private static ArrayList<NamespacedKey> removedRecipes = new ArrayList<>();
 
     public MainConfig(File file, Gson gson) {
         this.configFile = file;
@@ -58,11 +58,11 @@ public class MainConfig {
         }
     }
 
-    public ArrayList<NamespacedKey> getRemovedRecipes() {
+    public static ArrayList<NamespacedKey> getRemovedRecipes() {
         return removedRecipes;
     }
 
-    public boolean isDebugEnabled() {
+    public static boolean isDebugEnabled() {
         return debugEnabled;
     }
 }

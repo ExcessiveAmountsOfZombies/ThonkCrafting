@@ -1,5 +1,6 @@
 package com.epherical.crafting.nms;
 
+import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.logging.Log;
 import com.google.gson.*;
 
@@ -29,12 +30,14 @@ public class NMS1_16V3 implements NMSInterface {
 
     private static final Logger LOG_MANAGER = LogManager.getLogger();
 
+    private ThonkCrafting thonkCrafting;
     private Class<?> craftNamespacedKey;
     private Method toMinecraftKey;
 
 
 
-    public NMS1_16V3() throws ClassNotFoundException, NoSuchMethodException {
+    public NMS1_16V3(ThonkCrafting thonkCrafting) throws ClassNotFoundException, NoSuchMethodException {
+        this.thonkCrafting = thonkCrafting;
         this.craftNamespacedKey = Class.forName("org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey");
         this.toMinecraftKey = craftNamespacedKey.getMethod("toMinecraft", NamespacedKey.class);
     }
@@ -128,13 +131,17 @@ public class NMS1_16V3 implements NMSInterface {
     public Object createRecipeChoice(JsonElement jsonElement) {
         if (jsonElement != null && !jsonElement.isJsonNull()) {
             if (jsonElement.isJsonObject()) {
-                return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())));
+                if (jsonElement.getAsJsonObject().has("data")) {
+                    return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())), true);
+                }
+                // todo maybe not true all the time, we'll leave it here for now
+                return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())), true);
             } else if (jsonElement.isJsonArray()) {
                 JsonArray jsonarray = jsonElement.getAsJsonArray();
                 if (jsonarray.size() == 0) {
                     throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
                 } else {
-                    return constructRecipeItemStack(StreamSupport.stream(jsonarray.spliterator(), false).map((element) -> createRecipeProvider(ChatDeserializer.m(element, "item"))));
+                    return constructRecipeItemStack(StreamSupport.stream(jsonarray.spliterator(), false).map((element) -> createRecipeProvider(ChatDeserializer.m(element, "item"))), true);
                 }
             } else {
                 throw new JsonSyntaxException("Expected item to be object or array of objects");
@@ -184,24 +191,38 @@ public class NMS1_16V3 implements NMSInterface {
         ItemStack itemStack = new ItemStack(item);
         if (jsonObject.has("data")) {
             try {
-                NBTTagCompound compound = new MojangsonParser(new StringReader(jsonObject.get("data").getAsString())).f();
-                itemStack.save(compound);
+                NBTTagCompound compound = new MojangsonParser(new StringReader(jsonObject.get("data").toString())).f();
+                NBTTagCompound tag = compound.getCompound("tag");
+                // We need to override the enchantment level tags to make them shorts since that's how they're made in game.
+                // the ones created here are using integer tags.
+                if (tag.hasKeyOfType("Enchantments", 9)) {
+                    NBTTagList list = tag.getList("Enchantments", 10);
+                    for (NBTBase nbtBase : list) {
+                        NBTTagCompound enchantment = (NBTTagCompound) nbtBase;
+                        enchantment.set("lvl", NBTTagShort.a((short) enchantment.getInt("lvl")));
+                    }
+                }
+
+                itemStack = ItemStack.a(compound.a(itemStack.save(new NBTTagCompound())));
             } catch (CommandSyntaxException e) {
                 e.printStackTrace();
             }
         }
+        int i = ChatDeserializer.a(jsonObject, "count", 1);
+        itemStack.setCount(i);
         return itemStack;
     }
 
     @Override // Access to private RecipeItemStack constructor
-    public Object constructRecipeItemStack(Stream<?> object) {
+    public Object constructRecipeItemStack(Stream<?> object, boolean hasData) {
         Object recipeItemStack = null;
         try {
             Class<?> clazz = Class.forName("net.minecraft.server.v1_16_R3.RecipeItemStack");
             Method method = clazz.getDeclaredMethod("b", Stream.class);
             method.setAccessible(true);
             recipeItemStack = method.invoke(clazz, object);
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            clazz.getField("exact").setBoolean(recipeItemStack, hasData);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
             e.printStackTrace();
         }
         return recipeItemStack;

@@ -1,6 +1,6 @@
 package com.epherical.crafting.logging;
 
-import com.epherical.crafting.ThonkCrafting;
+import com.epherical.crafting.config.MainConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,7 +10,7 @@ public class Log {
 
     public static void error(String error, Throwable stacktrace, Object... errorVariables) {
         LOG.error(error, errorVariables);
-        if (ThonkCrafting.getMainConfig().isDebugEnabled())
+        if (MainConfig.isDebugEnabled())
             LOG.error("Detailed logging enabled, printing stacktrace", stacktrace.getCause());
     }
 }

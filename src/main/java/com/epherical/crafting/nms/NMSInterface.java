@@ -27,5 +27,5 @@ public interface NMSInterface {
 
     Object createNMSItemStack(JsonObject object);
 
-    Object constructRecipeItemStack(Stream<?> object);
+    Object constructRecipeItemStack(Stream<?> object, boolean hasData);
 }

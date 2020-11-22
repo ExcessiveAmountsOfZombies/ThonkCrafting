@@ -98,7 +98,7 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
         return map;
     }
 
-    private static String[] b(JsonArray jsonarray) {
+    private static String[] validateShape(JsonArray jsonarray) {
         String[] astring = new String[jsonarray.size()];
         if (astring.length > 3) {
             throw new JsonSyntaxException("Invalid pattern: too many rows, 3 is maximum");
@@ -139,7 +139,7 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
     }
 
     @VisibleForTesting
-    static String[] a(String... astring) {
+    static String[] makeShape(String... astring) {
         int i = 2147483647;
         int j = 0;
         int k = 0;
@@ -174,7 +174,7 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
         }
     }
 
-    private static NonNullList<RecipeItemStack> b(String[] astring, Map<String, RecipeItemStack> map, int i, int j) {
+    private static NonNullList<RecipeItemStack> buildPattern(String[] astring, Map<String, RecipeItemStack> map, int i, int j) {
         NonNullList<RecipeItemStack> nonnulllist = NonNullList.a(i * j, RecipeItemStack.a);
         Set<String> set = Sets.newHashSet(map.keySet());
         set.remove(" ");
@@ -203,19 +203,18 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
 
         @Override
         public InternalRecipeShaped a(MinecraftKey minecraftKey, JsonObject jsonObject) {
-
             Map<String, RecipeItemStack> map = InternalRecipeShaped.createRecipeMap(ChatDeserializer.t(jsonObject, "key"));
-            String[] astring = InternalRecipeShaped.a(InternalRecipeShaped.b(ChatDeserializer.u(jsonObject, "pattern")));
+            String[] astring = InternalRecipeShaped.makeShape(InternalRecipeShaped.validateShape(ChatDeserializer.u(jsonObject, "pattern")));
             int i = astring[0].length();
             int j = astring.length;
-            NonNullList<RecipeItemStack> recipeItemStacks = InternalRecipeShaped.b(astring, map, i, j);
-            ItemStack itemstack = ShapedRecipes.a(ChatDeserializer.t(jsonObject, "result"));
+            NonNullList<RecipeItemStack> recipeItemStacks = InternalRecipeShaped.buildPattern(astring, map, i, j);
+            ItemStack itemstack = (ItemStack) ThonkCrafting.getNmsInterface().createNMSItemStack(ChatDeserializer.t(jsonObject, "result"));
 
             String s = ChatDeserializer.a(jsonObject, "group", "");
-            ShapedRecipes recipe = RecipeSerializer.a.a(minecraftKey, jsonObject);
+            //ShapedRecipes recipe = RecipeSerializer.a.a(minecraftKey, jsonObject);
             ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
-            //new InternalRecipeShaped(minecraftKey, s, i, j, nonnulllist, itemstack, options);
-            return new InternalRecipeShaped(recipe, s, options);
+
+            return new InternalRecipeShaped(minecraftKey, s, i, j, recipeItemStacks, itemstack, options);
         }
 
         @Override

@@ -36,7 +36,7 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
     public void onEnable() {
         super.onEnable();
         try {
-            nmsInterface = new NMS1_16V3();
+            nmsInterface = new NMS1_16V3(this);
         } catch (ClassNotFoundException | NoSuchMethodException e) {
             e.printStackTrace();
         }
