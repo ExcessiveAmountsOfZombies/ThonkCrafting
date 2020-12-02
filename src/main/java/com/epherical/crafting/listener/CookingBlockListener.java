@@ -33,7 +33,7 @@ public class CookingBlockListener implements Listener {
         if (!event.isCancelled() && event.getClickedBlock() != null) {
             Material materialClicked = event.getClickedBlock().getType();
             if (blocksWithHiddenRecipes.contains(materialClicked)) {
-                event.getClickedBlock().setMetadata("used-by", new FixedMetadataValue(plugin, event.getPlayer().getUniqueId()));
+                event.getClickedBlock().setMetadata(ThonkCrafting.USED_BY, new FixedMetadataValue(plugin, event.getPlayer().getUniqueId()));
             }
         }
     }

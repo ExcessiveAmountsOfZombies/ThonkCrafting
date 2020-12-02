@@ -12,8 +12,11 @@ import com.google.common.collect.Sets;
 import com.google.gson.*;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftRecipe;
+import org.bukkit.inventory.RecipeChoice;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +49,10 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
         return recipes;
     }
 
+    public NonNullList<RecipeItemStack> a() {
+        return this.recipes.a();
+    }
+
     @Override
     public boolean a(InventoryCrafting inventoryCrafting, World world) {
         return recipes.a(inventoryCrafting, world);
@@ -73,8 +80,61 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
 
     @Override
     public RecipeShaped toBukkitRecipe() {
+        RecipeShaped recipe;
         CraftItemStack result = CraftItemStack.asCraftMirror(recipes.getResult());
-        return new RecipeShaped(result, this);
+        recipe = new RecipeShaped(result, this);
+        recipe.setGroup(this.group);
+        label40:
+        switch(this.recipes.j()) {
+            case 1:
+                switch(this.recipes.i()) {
+                    case 1:
+                        recipe.shape("a");
+                        break label40;
+                    case 2:
+                        recipe.shape("ab");
+                        break label40;
+                    case 3:
+                        recipe.shape("abc");
+                    default:
+                        break label40;
+                }
+            case 2:
+                switch(this.recipes.i()) {
+                    case 1:
+                        recipe.shape("a", "b");
+                        break label40;
+                    case 2:
+                        recipe.shape("ab", "cd");
+                        break label40;
+                    case 3:
+                        recipe.shape("abc", "def");
+                    default:
+                        break label40;
+                }
+            case 3:
+                switch(this.recipes.i()) {
+                    case 1:
+                        recipe.shape("a", "b", "c");
+                        break;
+                    case 2:
+                        recipe.shape("ab", "cd", "ef");
+                        break;
+                    case 3:
+                        recipe.shape("abc", "def", "ghi");
+                }
+        }
+
+        char c = 'a';
+
+        for(Iterator var4 = this.recipes.a().iterator(); var4.hasNext(); ++c) {
+            RecipeItemStack list = (RecipeItemStack)var4.next();
+            RecipeChoice choice = CraftRecipe.toBukkit(list);
+            if (choice != null) {
+                recipe.setIngredient(c, choice);
+            }
+        }
+        return recipe;
     }
 
     private static Map<String, RecipeItemStack> createRecipeMap(JsonObject jsonObject) {
@@ -89,7 +149,7 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
                 throw new JsonSyntaxException("Invalid key entry: ' ' is a reserved symbol.");
             }
 
-            RecipeItemStack stack = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeChoice(entry.getValue());
+            RecipeItemStack stack = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeItemStack(entry.getValue());
 
             map.put(entry.getKey(), stack);
         }
@@ -199,6 +259,16 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
         }
     }
 
+    @Override
+    public IRecipe<?> getVanillaRecipe() {
+        return recipes;
+    }
+
+    @Override
+    public org.bukkit.Material getRelevantMaterial() {
+        return null;
+    }
+
     public static class ShapedSerializer implements RecipeSerializer<InternalRecipeShaped> {
 
         @Override
@@ -241,15 +311,5 @@ public class InternalRecipeShaped implements CustomRecipe, RecipeCrafting {
             packetDataSerializer.a(internalRecipeShaped.recipes.getResult());
 
         }
-    }
-
-    @Override
-    public IRecipe<?> getVanillaRecipe() {
-        return recipes;
-    }
-
-    @Override
-    public org.bukkit.Material getRelevantMaterial() {
-        return null;
     }
 }

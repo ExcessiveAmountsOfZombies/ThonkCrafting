@@ -1,8 +1,10 @@
 package com.epherical.crafting.config;
 
+import com.epherical.crafting.logging.Log;
 import com.epherical.crafting.nms.NMSInterface;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import org.bukkit.NamespacedKey;
 
 import java.io.File;
@@ -50,8 +52,8 @@ public class RecipeLoader {
                         // TODO: throw error here and continue
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException | JsonSyntaxException e) {
+                    Log.error("Could not parse recipe {}", e, key);
                 }
 
             }

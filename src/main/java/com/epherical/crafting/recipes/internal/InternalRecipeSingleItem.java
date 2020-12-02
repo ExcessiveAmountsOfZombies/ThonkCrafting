@@ -1,6 +1,7 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.OptionRegister;
+import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.google.gson.JsonObject;
@@ -76,20 +77,19 @@ public abstract class InternalRecipeSingleItem extends RecipeStonecutting implem
 
         @Override
         public T a(MinecraftKey key, JsonObject json) {
-            // TODO: make this better
-            String var2 = ChatDeserializer.a(json, "group", "");
-            RecipeItemStack var3;
+            String group = ChatDeserializer.a(json, "group", "");
+            RecipeItemStack input;
             if (ChatDeserializer.d(json, "ingredient")) {
-                var3 = RecipeItemStack.a(ChatDeserializer.u(json, "ingredient"));
+                // This might be a problem because it expects a JSONArray, so if someone actually tries to use a JSON array it'll probably error
+                input = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeItemStack(ChatDeserializer.u(json, "ingredient"));
             } else {
-                var3 = RecipeItemStack.a(ChatDeserializer.t(json, "ingredient"));
+                // ChatDeserializer.t is the one used in other serializers so this is the one that'll probably be called more often.
+                input = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeItemStack(ChatDeserializer.t(json, "ingredient"));
             }
 
-            String var4 = ChatDeserializer.h(json, "result");
-            int var5 = ChatDeserializer.n(json, "count");
-            ItemStack var6 = new ItemStack(IRegistry.ITEM.get(new MinecraftKey(var4)), var5);
+            ItemStack result = (ItemStack) ThonkCrafting.getNmsInterface().createNMSItemStack(ChatDeserializer.t(json, "result"));
             ArrayList<Options> options = OptionRegister.getOptions(json);
-            return this.instance.create(key, var2, var3, var6, options);
+            return this.instance.create(key, group, input, result, options);
         }
 
         @Override

@@ -56,7 +56,7 @@ public class RecipeListener implements Listener {
         Recipe recipe = plugin.getNmsInterface().getCookingRecipeFromIngredient((TileState) event.getBlock().getState(), event.getBlock().getWorld());
         if (recipe instanceof CustomRecipe) {
             CustomRecipe customRecipe = (CustomRecipe) recipe;
-            UUID playerUUID = UUID.fromString(event.getBlock().getMetadata("used-by").get(0).asString());
+            UUID playerUUID = UUID.fromString(event.getBlock().getMetadata(ThonkCrafting.USED_BY).get(0).asString());
             Player player = Bukkit.getPlayer(playerUUID);
             if (player == null) {
                 event.setCancelled(true);
@@ -84,8 +84,8 @@ public class RecipeListener implements Listener {
         if (customRecipes.size() == 0) {
             return;
         }
-        // TODO: use global variable for metadata tag
-        UUID playerUUID = UUID.fromString(event.getBlock().getMetadata("used-by").get(0).asString());
+
+        UUID playerUUID = UUID.fromString(event.getBlock().getMetadata(ThonkCrafting.USED_BY).get(0).asString());
         Material blockMaterial = event.getBlock().getType();
         for (CustomRecipe customRecipe : customRecipes) {
             if (customRecipe.getRelevantMaterial() == blockMaterial) {

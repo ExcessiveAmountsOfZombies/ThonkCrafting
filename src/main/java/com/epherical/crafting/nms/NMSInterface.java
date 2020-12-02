@@ -15,15 +15,17 @@ public interface NMSInterface {
 
     Object getMinecraftKey(NamespacedKey key);
 
+    void overrideRecipe(Object minecraftKey, JsonObject object);
+
     void registerRecipes(Map<NamespacedKey, JsonObject> map);
 
     Recipe getCookingRecipeFromIngredient(TileState furnace, World world);
 
     ArrayList<NamespacedKey> getRecipeKeys();
 
-    Object createRecipeChoice(JsonElement element);
+    Object createRecipeItemStack(JsonElement element);
 
-    Object createRecipeProvider(JsonObject object);
+    Object createRecipeItemStackProvider(JsonObject object);
 
     Object createNMSItemStack(JsonObject object);
 

@@ -20,20 +20,28 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ThonkCrafting extends JavaPlugin implements Listener {
 
+    private static ThonkCrafting instance;
     private ProtocolManager protocolManager;
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private Gson gson;
     private static ConfigManager manager;
+
+    public static final String USED_BY = "used-by";
 
     private static NMSInterface nmsInterface;
 
     @Override
     public void onLoad() {
+        GsonBuilder builder = new GsonBuilder();
+        gson = builder.setPrettyPrinting().create();
+
         CraftingRegistry.init();
         protocolManager = ProtocolLibrary.getProtocolManager();
     }
 
     @Override
     public void onEnable() {
+
+        instance = this;
         super.onEnable();
         try {
             nmsInterface = new NMS1_16V3(this);
@@ -53,6 +61,12 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         getCommand("bingo").setExecutor(command);
         getCommand("bingo").setTabCompleter(command);
 
+    }
+
+
+
+    public static ThonkCrafting getInstance() {
+        return instance;
     }
 
     @Override

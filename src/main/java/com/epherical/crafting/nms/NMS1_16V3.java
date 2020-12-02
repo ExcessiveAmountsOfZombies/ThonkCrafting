@@ -2,10 +2,10 @@ package com.epherical.crafting.nms;
 
 import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.logging.Log;
+import com.epherical.crafting.recipes.nbt.JsonToNBT;
 import com.google.gson.*;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.serialization.Dynamic;
 import net.minecraft.server.v1_16_R3.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -51,6 +52,13 @@ public class NMS1_16V3 implements NMSInterface {
         }
 
         return null;
+    }
+
+    @Override
+    public void overrideRecipe(Object minecraftKey, JsonObject object) {
+        Map<NamespacedKey, JsonObject> map = new HashMap<>();
+        map.put(CraftNamespacedKey.fromMinecraft((MinecraftKey) minecraftKey), object);
+        registerRecipes(map);
     }
 
     @Override
@@ -128,20 +136,20 @@ public class NMS1_16V3 implements NMSInterface {
     }
 
     @Override // RecipeItemStack Replicates  public static RecipeItemStack a(@Nullable JsonElement jsonelement)
-    public Object createRecipeChoice(JsonElement jsonElement) {
+    public Object createRecipeItemStack(JsonElement jsonElement) {
         if (jsonElement != null && !jsonElement.isJsonNull()) {
             if (jsonElement.isJsonObject()) {
                 if (jsonElement.getAsJsonObject().has("data")) {
-                    return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())), true);
+                    return constructRecipeItemStack(Stream.of(createRecipeItemStackProvider(jsonElement.getAsJsonObject())), true);
                 }
                 // todo maybe not true all the time, we'll leave it here for now
-                return constructRecipeItemStack(Stream.of(createRecipeProvider(jsonElement.getAsJsonObject())), true);
+                return constructRecipeItemStack(Stream.of(createRecipeItemStackProvider(jsonElement.getAsJsonObject())), true);
             } else if (jsonElement.isJsonArray()) {
                 JsonArray jsonarray = jsonElement.getAsJsonArray();
                 if (jsonarray.size() == 0) {
                     throw new JsonSyntaxException("Item array cannot be empty, at least one item must be defined");
                 } else {
-                    return constructRecipeItemStack(StreamSupport.stream(jsonarray.spliterator(), false).map((element) -> createRecipeProvider(ChatDeserializer.m(element, "item"))), true);
+                    return constructRecipeItemStack(StreamSupport.stream(jsonarray.spliterator(), false).map((element) -> createRecipeItemStackProvider(ChatDeserializer.m(element, "item"))), true);
                 }
             } else {
                 throw new JsonSyntaxException("Expected item to be object or array of objects");
@@ -152,7 +160,7 @@ public class NMS1_16V3 implements NMSInterface {
     }
 
     @Override // RecipeItemStack.Provider
-    public Object createRecipeProvider(JsonObject object) {
+    public Object createRecipeItemStackProvider(JsonObject object) {
         if (object.has("item") && object.has("tag")) {
             throw new JsonParseException("An ingredient entry is either a tag or an item, not both");
         } else {
@@ -190,23 +198,25 @@ public class NMS1_16V3 implements NMSInterface {
         Item item = IRegistry.ITEM.getOptional(new MinecraftKey(s)).orElseThrow(() -> new JsonSyntaxException("Unknown item '" + s + "'"));
         ItemStack itemStack = new ItemStack(item);
         if (jsonObject.has("data")) {
-            try {
-                NBTTagCompound compound = new MojangsonParser(new StringReader(jsonObject.get("data").toString())).f();
-                NBTTagCompound tag = compound.getCompound("tag");
-                // We need to override the enchantment level tags to make them shorts since that's how they're made in game.
-                // the ones created here are using integer tags.
-                if (tag.hasKeyOfType("Enchantments", 9)) {
-                    NBTTagList list = tag.getList("Enchantments", 10);
-                    for (NBTBase nbtBase : list) {
-                        NBTTagCompound enchantment = (NBTTagCompound) nbtBase;
-                        enchantment.set("lvl", NBTTagShort.a((short) enchantment.getInt("lvl")));
-                    }
-                }
 
-                itemStack = ItemStack.a(compound.a(itemStack.save(new NBTTagCompound())));
-            } catch (CommandSyntaxException e) {
-                e.printStackTrace();
+            NBTBase base = Dynamic.convert(JsonToNBT.INSTANCE, DynamicOpsNBT.a, jsonObject.get("data"));
+            NBTTagCompound compound = (NBTTagCompound) base;
+            NBTTagCompound tag = compound.getCompound("tag");
+            // We need to override the enchantment level tags to make them shorts since that's how they're made in game.
+            // the ones created here are using integer tags.
+            if (tag.hasKeyOfType("Enchantments", 9)) {
+                NBTTagList list = tag.getList("Enchantments", 10);
+                for (NBTBase nbtBase : list) {
+                    NBTTagCompound enchantment = (NBTTagCompound) nbtBase;
+                    enchantment.set("lvl", NBTTagShort.a((short) enchantment.getInt("lvl")));
+                }
             }
+            // TODO: CODECS in the future???
+            //ItemStack nbtDecode = ItemStack.a.decode(DynamicOpsNBT.a, base).result().get().getFirst();
+
+            //ItemStack decoded = ItemStack.a.decode(JsonToNBT.INSTANCE, jsonObject).result().get().getFirst();
+
+            itemStack = ItemStack.a(compound.a(itemStack.save(new NBTTagCompound())));
         }
         int i = ChatDeserializer.a(jsonObject, "count", 1);
         itemStack.setCount(i);

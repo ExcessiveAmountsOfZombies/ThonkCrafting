@@ -1,8 +1,10 @@
 package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.OptionRegister;
+import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.server.v1_16_R3.*;
 
@@ -85,10 +87,18 @@ public abstract class InternalRecipeCooking extends RecipeCampfire implements Cu
 
         @Override
         public T a(MinecraftKey minecraftKey, JsonObject jsonObject) {
+            /*String group = ChatDeserializer.a(jsonObject, "group", "");
+            RecipeCooking cooking = RecipeSerializerCooking.s.a(minecraftKey, jsonObject);*/
+
             String group = ChatDeserializer.a(jsonObject, "group", "");
-            RecipeCooking cooking = RecipeSerializerCooking.s.a(minecraftKey, jsonObject);
+            JsonElement ingredientElement = ChatDeserializer.d(jsonObject, "ingredient") ? ChatDeserializer.u(jsonObject, "ingredient") : ChatDeserializer.t(jsonObject, "ingredient");
+            RecipeItemStack ingredientStack = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeItemStack(ingredientElement);
+            ItemStack resultStack = (ItemStack) ThonkCrafting.getNmsInterface().createNMSItemStack(ChatDeserializer.t(jsonObject, "result"));
+            float experience = ChatDeserializer.a(jsonObject, "experience", 0.0F);
+            int cookTime = ChatDeserializer.a(jsonObject, "cookingtime", 200);
+
             ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
-            return this.instance.create(minecraftKey, group, cooking.a().get(0), cooking.getResult(), cooking.getExperience(), cooking.getCookingTime(), options);
+            return this.instance.create(minecraftKey, group, ingredientStack, resultStack, experience, cookTime, options);
         }
 
         @Override

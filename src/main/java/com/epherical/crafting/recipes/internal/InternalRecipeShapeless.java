@@ -2,11 +2,13 @@ package com.epherical.crafting.recipes.internal;
 
 import com.epherical.crafting.CraftingRegistry;
 import com.epherical.crafting.OptionRegister;
+import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.RecipeShapeless;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.StringReader;
+import com.google.gson.JsonParseException;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
@@ -87,10 +89,31 @@ public class InternalRecipeShapeless implements CustomRecipe, RecipeCrafting {
 
         @Override
         public InternalRecipeShapeless a(MinecraftKey minecraftKey, JsonObject jsonObject) {
-            String s = ChatDeserializer.a(jsonObject, "group", "");
-            ShapelessRecipes recipe = RecipeSerializer.b.a(minecraftKey, jsonObject);
-            ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
-            return new InternalRecipeShapeless(recipe, s, options);
+            String group = ChatDeserializer.a(jsonObject, "group", "");
+            NonNullList<RecipeItemStack> ingredients = deserializeIngredients(ChatDeserializer.u(jsonObject, "ingredients"));
+            if (ingredients.isEmpty()) {
+                throw new JsonParseException("No ingredients for shapeless recipe");
+            } else if (ingredients.size() > 9) {
+                throw new JsonParseException("Too many ingredients for shapeless recipe");
+            } else {
+                ItemStack itemstack = (ItemStack) ThonkCrafting.getNmsInterface().createNMSItemStack(ChatDeserializer.t(jsonObject, "result"));
+                ArrayList<Options> options = OptionRegister.getOptions(jsonObject);
+                return new InternalRecipeShapeless(minecraftKey, group, itemstack, ingredients, options);
+            }
+        }
+
+        private static NonNullList<RecipeItemStack> deserializeIngredients(JsonArray jsonArray) {
+            NonNullList<RecipeItemStack> ingredients = NonNullList.a();
+
+            for(int i = 0; i < jsonArray.size(); ++i) {
+                RecipeItemStack recipeitemstack = (RecipeItemStack) ThonkCrafting.getNmsInterface().createRecipeItemStack(jsonArray.get(i));
+
+                if (!recipeitemstack.d()) {
+                    ingredients.add(recipeitemstack);
+                }
+            }
+
+            return ingredients;
         }
 
         @Override // client method?

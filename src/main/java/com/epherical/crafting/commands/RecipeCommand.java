@@ -1,30 +1,24 @@
 package com.epherical.crafting.commands;
 
 import com.epherical.crafting.ThonkCrafting;
-import com.epherical.crafting.recipes.CustomRecipe;
-import com.epherical.crafting.recipes.impl.*;
-import com.epherical.crafting.ui.Menu;
-import com.epherical.crafting.ui.MenuDefaults;
-import com.epherical.crafting.ui.click.MenuButton;
-import com.epherical.crafting.util.ItemUtil;
-import net.md_5.bungee.api.chat.BaseComponent;
+import com.epherical.crafting.gui.RecipeCreatorMenu;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static net.minecraft.server.v1_16_R3.Items.jf;
 
 public class RecipeCommand implements CommandExecutor, TabCompleter {
 
@@ -46,7 +40,18 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
                 return false;
             }
 
+            boolean trufalse = Boolean.parseBoolean(args[1]);
 
+            /*Consumer<ji.a> consumer = jf1 -> {
+            };
+            consumer.accept(new ji.a());*/
+
+            /*net.minecraft.server.v1_16_R3.jf clasz;
+            ji.a jia = new ji.a();
+            jia.a();*/
+
+            new RecipeCreatorMenu(recipe, commandSender, trufalse);
+            //new RecipeMenu(recipe, commandSender);
         }
 
         return true;
