@@ -2,7 +2,6 @@ package com.epherical.crafting.commands;
 
 import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.gui.RecipeCreatorMenu;
-import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -11,14 +10,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
-import org.bukkit.util.StringUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static net.minecraft.server.v1_16_R3.Items.jf;
 
 public class RecipeCommand implements CommandExecutor, TabCompleter {
 
@@ -33,25 +30,38 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         if (commandSender instanceof Player) {
-            NamespacedKey key = ThonkCrafting.createKey(args[0]);
+            Player player = (Player) commandSender;
+            if (args.length >= 1) {
+                NamespacedKey key = ThonkCrafting.createKey(args[0]);
 
-            Recipe recipe = Bukkit.getRecipe(key);
-            if (recipe == null) {
-                return false;
+                Recipe recipe = null;
+                if (player.hasPermission("thonkcrafting.view.allrecipes")) {
+                    recipe = Bukkit.getRecipe(key);
+                } else {
+                    Set<NamespacedKey> keySet = player.getDiscoveredRecipes();
+                    if (keySet.contains(key)) {
+                        recipe = Bukkit.getRecipe(key);
+                    }
+                }
+
+
+                if (recipe == null) {
+                    return false;
+                }
+
+                boolean editRecipe = false;
+                boolean convertToThonkCraftingRecipe = false;
+                if (args.length > 1 && player.hasPermission("thonkcrafting.edit.recipe")) {
+                    editRecipe = Boolean.parseBoolean(args[1]);
+                }
+
+                if (args.length > 2 && player.hasPermission("thonkcrafting.edit.recipe")) {
+                    convertToThonkCraftingRecipe = Boolean.parseBoolean(args[2]);
+                }
+
+                new RecipeCreatorMenu(recipe, commandSender, editRecipe, convertToThonkCraftingRecipe);
             }
 
-            boolean trufalse = Boolean.parseBoolean(args[1]);
-
-            /*Consumer<ji.a> consumer = jf1 -> {
-            };
-            consumer.accept(new ji.a());*/
-
-            /*net.minecraft.server.v1_16_R3.jf clasz;
-            ji.a jia = new ji.a();
-            jia.a();*/
-
-            new RecipeCreatorMenu(recipe, commandSender, trufalse);
-            //new RecipeMenu(recipe, commandSender);
         }
 
         return true;
@@ -63,9 +73,23 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             String commandPiece = args[0];
 
-            StringUtil.copyPartialMatches(commandPiece, recipeKeys, completedList);
+            copyPartialMatches(commandPiece, recipeKeys, completedList);
         }
 
         return completedList;
+    }
+
+    public static <T extends Collection<? super String>> T copyPartialMatches(String token, Iterable<String> originals, T collection) throws UnsupportedOperationException, IllegalArgumentException {
+        for (String string : originals) {
+            if (containsIgnoreCase(string, token)) {
+                collection.add(string);
+            }
+        }
+
+        return collection;
+    }
+
+    public static boolean containsIgnoreCase(String string, String prefix) throws IllegalArgumentException, NullPointerException {
+        return string.toLowerCase().contains(prefix.toLowerCase());
     }
 }

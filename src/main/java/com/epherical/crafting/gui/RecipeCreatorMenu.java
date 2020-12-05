@@ -2,11 +2,11 @@ package com.epherical.crafting.gui;
 
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.recipes.RecipeGenerator;
+import com.epherical.crafting.recipes.RecipeToJson;
 import com.epherical.crafting.recipes.impl.*;
 import com.epherical.crafting.ui.Menu;
 import com.epherical.crafting.ui.MenuDefaults;
 import com.epherical.crafting.ui.click.MenuButton;
-import net.minecraft.server.v1_16_R3.jf;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class RecipeCreatorMenu {
 
 
-    public RecipeCreatorMenu(Recipe recipe, CommandSender sender, boolean edit) {
+    public RecipeCreatorMenu(Recipe recipe, CommandSender sender, boolean edit, boolean convertToThonkCraftingRecipe) {
         if (recipe instanceof CustomRecipe) {
             // TODO: add in ability to add options to the recipe.
             CustomRecipe recipe1 = (CustomRecipe) recipe;
@@ -34,7 +34,7 @@ public class RecipeCreatorMenu {
             // VANILLA RECIPE
             ShapedRecipe cast = (ShapedRecipe) recipe;
             createCraftingMenu(cast.getKey(), cast.getGroup(), shapedRecipeMenu(cast.getIngredientMap(),
-                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", sender, edit, true, true);
+                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", sender, edit, true, !convertToThonkCraftingRecipe);
         } else if (recipe instanceof RecipeShaped) {
             // THONKCRAFTING RECIPE
             RecipeShaped cast = (RecipeShaped) recipe;
@@ -44,18 +44,20 @@ public class RecipeCreatorMenu {
             // VANILLA RECIPE
             ShapelessRecipe cast = (ShapelessRecipe) recipe;
             createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
-                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", sender, edit, false, true);
+                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", sender, edit, false, !convertToThonkCraftingRecipe);
         } else if (recipe instanceof RecipeShapeless) {
             // THONKCRAFTING RECIPE
             RecipeShapeless cast = (RecipeShapeless) recipe;
             createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
                     edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", sender, edit, false, false);
         } else if (recipe instanceof CookingRecipe ) { // the blob of code that makes your eyes glaze over
+            // VANILLA RECIPE
             CookingRecipe<?> cast = (CookingRecipe<?>) recipe;
-            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast);
+            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast, convertToThonkCraftingRecipe);
         } else if (recipe instanceof AbstractCooking) {
+            // THONKCRAFTING RECIPE
             AbstractCooking cast = (AbstractCooking) recipe;
-            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast);
+            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast, false);
         } else if (recipe instanceof RecipeSmithing) {
             RecipeSmithing cast = (RecipeSmithing) recipe;
 
@@ -71,7 +73,7 @@ public class RecipeCreatorMenu {
         } else if (recipe instanceof StonecuttingRecipe) {
             // VANILLA RECIPE
             StonecuttingRecipe cast = (StonecuttingRecipe) recipe;
-            createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", sender, edit, true, cast.getKey(), cast.getGroup());
+            createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", sender, edit, !convertToThonkCraftingRecipe, cast.getKey(), cast.getGroup());
         }
     }
 
@@ -126,7 +128,7 @@ public class RecipeCreatorMenu {
         menu.openInventory((HumanEntity) sender);
     }
 
-    private void createCookingMenu(ItemStack input, ItemStack result, String menuName, CommandSender sender, boolean editingRecipe, Recipe recipe) {
+    private void createCookingMenu(ItemStack input, ItemStack result, String menuName, CommandSender sender, boolean editingRecipe, Recipe recipe, boolean convertToThonkCraftingRecipe) {
         Menu.Builder builder = new Menu.Builder(6, menuName, true, Material.BLACK_STAINED_GLASS_PANE)
                 .addMenuButton(24, new MenuButton(event -> event.setCancelled(!editingRecipe), result))
                 .addMenuButton(12, new MenuButton(event -> event.setCancelled(!editingRecipe), input))
@@ -134,7 +136,7 @@ public class RecipeCreatorMenu {
                 .addMenuButton(38, MenuDefaults.defaultCloseButton(38))
                 .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), Material.COMMAND_BLOCK));
         if (editingRecipe) {
-            builder.addMenuButton(40, acceptButtonCooking(recipe, Material.NETHER_STAR));
+            builder.addMenuButton(40, acceptButtonCooking(recipe, Material.NETHER_STAR, convertToThonkCraftingRecipe));
         } else {
             builder.addMenuButton(42, new MenuButton(event -> event.setCancelled(true), Material.PRISMARINE_SHARD));
             builder.addMenuButton(43, new MenuButton(event -> event.setCancelled(true), Material.FEATHER));
@@ -176,7 +178,7 @@ public class RecipeCreatorMenu {
         menu.openInventory((HumanEntity) sender);
     }*/
 
-    private MenuButton acceptButtonCooking(Recipe recipe, Material material) {
+    private MenuButton acceptButtonCooking(Recipe recipe, Material material, boolean convertToThonkCraftingRecipe) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName("Accept");
@@ -187,29 +189,18 @@ public class RecipeCreatorMenu {
             ItemStack input = event.getInventory().getItem(12);
             ItemStack result = event.getInventory().getItem(24);
 
-            jf json = null;
+            RecipeToJson json = null;
 
             // TODO: find a way to not use instanceof trash it looks so ugly and i'm sure there is a better way that makes sense
+
             if (recipe instanceof RecipeBlasting) {
                 // ThonkCrafting Blasting
                 RecipeBlasting cast = (RecipeBlasting) recipe;
                 json = RecipeGenerator.createCustomBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof BlastingRecipe) {
-                // Vanilla Blasting
-                BlastingRecipe cast = (BlastingRecipe) recipe;
-                json = RecipeGenerator.createVanillaBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof CampfireRecipe) {
-                // Vanilla Campfire
-                CampfireRecipe cast = (CampfireRecipe) recipe;
-                json = RecipeGenerator.createVanillaCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
             } else if (recipe instanceof RecipeCampfire) {
                 // ThonkCrafting Campfire
                 RecipeCampfire cast = (RecipeCampfire) recipe;
                 json = RecipeGenerator.createCustomCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof SmokingRecipe) {
-                // Vanilla Smoking
-                SmokingRecipe cast = (SmokingRecipe) recipe;
-                json = RecipeGenerator.createVanillaSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
             } else if (recipe instanceof RecipeSmoking) {
                 // ThonkCrafting Smoking
                 RecipeSmoking cast = (RecipeSmoking) recipe;
@@ -218,10 +209,30 @@ public class RecipeCreatorMenu {
                 // ThonkCrafting Smelting
                 RecipeSmelting cast = (RecipeSmelting) recipe;
                 json = RecipeGenerator.createCustomSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
+            } else if (recipe instanceof BlastingRecipe) {
+                // Vanilla Blasting
+                BlastingRecipe cast = (BlastingRecipe) recipe;
+                json = convertToThonkCraftingRecipe
+                        ? RecipeGenerator.createCustomBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
+                        : RecipeGenerator.createVanillaBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
+            } else if (recipe instanceof CampfireRecipe) {
+                // Vanilla Campfire
+                CampfireRecipe cast = (CampfireRecipe) recipe;
+                json = convertToThonkCraftingRecipe
+                        ? RecipeGenerator.createCustomCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
+                        : RecipeGenerator.createVanillaCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
+            } else if (recipe instanceof SmokingRecipe) {
+                // Vanilla Smoking
+                SmokingRecipe cast = (SmokingRecipe) recipe;
+                json = convertToThonkCraftingRecipe
+                        ? RecipeGenerator.createCustomSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
+                        : RecipeGenerator.createVanillaSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
             } else if (recipe instanceof FurnaceRecipe) {
                 // Vanilla Smelting
                 FurnaceRecipe cast = (FurnaceRecipe) recipe;
-                json = RecipeGenerator.createVanillaSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
+                json = convertToThonkCraftingRecipe
+                        ? RecipeGenerator.createCustomSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
+                        : RecipeGenerator.createVanillaSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
             }
 
 
@@ -241,7 +252,7 @@ public class RecipeCreatorMenu {
             ItemStack result = event.getInventory().getItem(24);
 
 
-            jf json;
+            RecipeToJson json;
 
             if (isVanillaRecipe) {
                 json = RecipeGenerator.createVanillaCuttingRecipe(key, group, input, result, result != null ? result.getAmount() : 0);
@@ -288,15 +299,15 @@ public class RecipeCreatorMenu {
             // result slot
             ItemStack result = event.getInventory().getItem(24);
 
-            jf json;
+            RecipeToJson json;
 
             if (isShapedRecipe) {
-                json = new RecipeGenerator.RecipeShapedToJson(key, result, group, shape, ingredients);
+                json = new RecipeGenerator.RecipeShapedToJson(key, result, group, shape, ingredients, isVanillaRecipe);
             } else {
                 if (isVanillaRecipe) {
                     json = RecipeGenerator.createVanillaShapelessRecipe(key, result, result != null ? result.getAmount() : 0, group, ingredients.values());
                 } else {
-                    json = new RecipeGenerator.RecipeShapelessToJson(key, result, group, ingredients.values());
+                    json = new RecipeGenerator.RecipeShapelessToJson(key, result, group, ingredients.values(), false);
                 }
 
             }

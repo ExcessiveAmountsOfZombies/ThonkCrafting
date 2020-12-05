@@ -1,6 +1,6 @@
 package com.epherical.crafting.item;
 
-import com.epherical.crafting.ThonkCrafting;
+/*import com.epherical.crafting.ThonkCrafting;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -178,4 +178,4 @@ public class RecipeBook {
     private Component parseType(String type) {
         return Component.text(type);
     }
-}
+}*/
