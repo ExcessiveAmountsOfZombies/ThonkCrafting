@@ -326,30 +326,6 @@ public class RecipeGenerator {
         }
     }
 
-    public static CookingRecipeToJson createCustomCampfireRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                                 org.bukkit.inventory.ItemStack result, float experience, int cookingTime) {
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, CraftingRegistry.CAMPFIRE_SERIALIZER, false);
-    }
-
-    public static CookingRecipeToJson createCustomSmokingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                                org.bukkit.inventory.ItemStack result, float experience, int cookingTime) {
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, CraftingRegistry.SMOKING_SERIALIZER, false);
-    }
-
-    public static CookingRecipeToJson createCustomSmeltingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                                 org.bukkit.inventory.ItemStack result, float experience, int cookingTime) {
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, CraftingRegistry.SMELTING_SERIALIZER, false);
-    }
-
-    public static CookingRecipeToJson createCustomBlastingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                                 org.bukkit.inventory.ItemStack result, float experience, int cookingTime) {
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, CraftingRegistry.BLASTING_SERIALIZER, false);
-    }
-
     public static CookingRecipeToJson createCookingRecipe(NamespacedKey recipeKey, String group, org.bukkit.inventory.ItemStack input,
                                                           org.bukkit.inventory.ItemStack result, float experience, int cookingTime, NamespacedKey recipeSerializerKey) {
         RecipeSerializer<?> serializer = IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(recipeSerializerKey));
@@ -357,38 +333,8 @@ public class RecipeGenerator {
         if (recipeSerializerKey.getNamespace().startsWith("minecraft")) {
             vanillaRecipe = true;
         }
-
         return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(recipeKey), group,
                 CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, serializer, vanillaRecipe);
-    }
-
-    public static CookingRecipeToJson createVanillaCampfireRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                   org.bukkit.inventory.ItemStack result, float experience, int cookTime) {
-
-        // Going to make it a variable to if the serializer changes it'll break here potentially
-        RecipeSerializerCooking<RecipeCampfire> serializer = RecipeSerializer.s;
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookTime, serializer, true);
-    }
-
-    public static CookingRecipeToJson createVanillaSmokingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                  org.bukkit.inventory.ItemStack result, float experience, int cookTime) {
-
-        RecipeSerializerCooking<RecipeSmoking> serializer = RecipeSerializer.r;
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookTime, serializer, true);
-    }
-
-    public static CookingRecipeToJson createVanillaSmeltingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                   org.bukkit.inventory.ItemStack result, float experience, int cookTime) {
-
-        RecipeSerializerCooking<FurnaceRecipe> serializer = RecipeSerializer.p;
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookTime, serializer, true);
-    }
-
-    public static CookingRecipeToJson createVanillaBlastingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
-                                                   org.bukkit.inventory.ItemStack result, float experience, int cookTime) {
-
-        RecipeSerializerCooking<RecipeBlasting> serializer = RecipeSerializer.q;
-        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(key), group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookTime, serializer, true);
     }
 
     public static RecipeShapelessToJson createVanillaShapelessRecipe(NamespacedKey key, org.bukkit.inventory.ItemStack result, int outputAmount,
