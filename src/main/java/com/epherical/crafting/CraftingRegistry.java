@@ -1,7 +1,22 @@
 package com.epherical.crafting;
 
+import com.epherical.crafting.gui.RecipeMenus;
+import com.epherical.crafting.recipes.impl.RecipeBlasting;
+import com.epherical.crafting.recipes.impl.RecipeCampfire;
+import com.epherical.crafting.recipes.impl.RecipeSmelting;
+import com.epherical.crafting.recipes.impl.RecipeSmoking;
 import com.epherical.crafting.recipes.internal.*;
+import com.epherical.crafting.ui.Menu;
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.NamespacedKey;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftBlastingRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftCampfireRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftFurnaceRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftSmokingRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CraftingRegistry {
 
@@ -12,6 +27,12 @@ public class CraftingRegistry {
     public static InternalRecipeCooking.CookingSerializer<InternalRecipeSmelting> SMELTING_SERIALIZER;
     public static InternalRecipeCooking.CookingSerializer<InternalRecipeSmoking>  SMOKING_SERIALIZER;
     public static InternalRecipeSingleItem.SingleItemSerializer<InternalRecipeStonecutting> STONECUTTING_SERIALIZER;
+
+    public static Map<RecipeSerializer<?>, RecipeCreator<Menu>> serializingMenuMaps = new HashMap<>();
+    public static Map<RecipeSerializer<?>, RecipeType> recipeTypeMap = new HashMap<>();
+
+    public static Map<String, NamespacedKey> recipeClassSerializerMap = new HashMap<>();
+    public static Map<String, Class<?>> baseToCustomClass = new HashMap<>();
 
 
     public static void init() {
@@ -38,6 +59,66 @@ public class CraftingRegistry {
                 new InternalRecipeSingleItem.SingleItemSerializer<>(InternalRecipeStonecutting::new));
 
 
+        serializingMenuMaps.put(RecipeSerializer.a, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(SHAPED_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.b, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(SHAPELESS_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.p, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(SMELTING_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.q, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(BLASTING_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.r, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(SMOKING_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.s, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(CAMPFIRE_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        serializingMenuMaps.put(RecipeSerializer.t, RecipeMenus::recipeCreatorMenu);
+        serializingMenuMaps.put(STONECUTTING_SERIALIZER, RecipeMenus::recipeCreatorMenu);
+
+        recipeTypeMap.put(RecipeSerializer.a, RecipeType.SHAPED);
+        recipeTypeMap.put(SHAPED_SERIALIZER, RecipeType.SHAPED);
+
+        recipeTypeMap.put(RecipeSerializer.b, RecipeType.SHAPELESS);
+        recipeTypeMap.put(SHAPELESS_SERIALIZER, RecipeType.SHAPELESS);
+
+        recipeTypeMap.put(RecipeSerializer.p, RecipeType.COOKING);
+        recipeTypeMap.put(SMELTING_SERIALIZER, RecipeType.COOKING);
+
+        recipeTypeMap.put(RecipeSerializer.q, RecipeType.COOKING);
+        recipeTypeMap.put(BLASTING_SERIALIZER, RecipeType.COOKING);
+
+        recipeTypeMap.put(RecipeSerializer.r, RecipeType.COOKING);
+        recipeTypeMap.put(SMOKING_SERIALIZER, RecipeType.COOKING);
+
+        recipeTypeMap.put(RecipeSerializer.s, RecipeType.COOKING);
+        recipeTypeMap.put(CAMPFIRE_SERIALIZER, RecipeType.COOKING);
+
+        recipeTypeMap.put(RecipeSerializer.t, RecipeType.CUTTING);
+        recipeTypeMap.put(STONECUTTING_SERIALIZER, RecipeType.CUTTING);
+
+        recipeClassSerializerMap.put(RecipeBlasting.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(BLASTING_SERIALIZER)));
+        recipeClassSerializerMap.put(RecipeCampfire.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(CAMPFIRE_SERIALIZER)));
+        recipeClassSerializerMap.put(RecipeSmoking.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SMOKING_SERIALIZER)));
+        recipeClassSerializerMap.put(RecipeSmelting.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SMELTING_SERIALIZER)));
+
+        recipeClassSerializerMap.put(CraftBlastingRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.q)));
+        recipeClassSerializerMap.put(CraftCampfireRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.s)));
+        recipeClassSerializerMap.put(CraftSmokingRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.r)));
+        recipeClassSerializerMap.put(CraftFurnaceRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.p)));
+
+
+        baseToCustomClass.put(CraftBlastingRecipe.class.getName(), RecipeBlasting.class);
+        baseToCustomClass.put(CraftCampfireRecipe.class.getName(), RecipeCampfire.class);
+        baseToCustomClass.put(CraftSmokingRecipe.class.getName(),  RecipeSmoking.class);
+        baseToCustomClass.put(CraftFurnaceRecipe.class.getName(),  RecipeSmelting.class);
+
+        /*serializingMenuMaps.put(RecipeSerializer.u);
+        serializingMenuMaps.put()*/
     }
 
     private static <S extends RecipeSerializer<T>, T extends IRecipe<?>> S initSerializer(MinecraftKey key, S object) {
@@ -46,5 +127,17 @@ public class CraftingRegistry {
             instance = RegistryMaterials.a(RegistryMaterials.RECIPE_SERIALIZER, key, object);
         }
         return instance;
+    }
+
+    public interface RecipeCreator<T extends Menu> {
+        T create(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey);
+    }
+
+    public enum RecipeType {
+        SHAPED,
+        SHAPELESS,
+        COOKING,
+        CUTTING,
+        SMITHING
     }
 }

@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RecipeMenu {
+public class UnusedRecipe {
 
-    public RecipeMenu(Recipe recipe, CommandSender commandSender) {
+    public UnusedRecipe(Recipe recipe, CommandSender commandSender) {
         List<BaseComponent[]> information = new ArrayList<>();
 
 

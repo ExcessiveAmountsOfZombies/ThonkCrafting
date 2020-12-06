@@ -1,7 +1,7 @@
 package com.epherical.crafting.commands;
 
 import com.epherical.crafting.ThonkCrafting;
-import com.epherical.crafting.gui.RecipeCreatorMenu;
+import com.epherical.crafting.gui.RecipeMenus;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
@@ -11,10 +11,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RecipeCommand implements CommandExecutor, TabCompleter {
@@ -41,6 +38,8 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
                     Set<NamespacedKey> keySet = player.getDiscoveredRecipes();
                     if (keySet.contains(key)) {
                         recipe = Bukkit.getRecipe(key);
+                    } else {
+                        player.sendMessage("You have not discovered that recipe yet, so you can't view it.");
                     }
                 }
 
@@ -52,14 +51,26 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
                 boolean editRecipe = false;
                 boolean convertToThonkCraftingRecipe = false;
                 if (args.length > 1 && player.hasPermission("thonkcrafting.edit.recipe")) {
-                    editRecipe = Boolean.parseBoolean(args[1]);
+                    if (args[1].equalsIgnoreCase("edit")) {
+                        editRecipe = true;
+                    } else {
+                        editRecipe = Boolean.parseBoolean(args[1]);
+                    }
+                } else {
+                    player.sendMessage("You do not have permission to edit the recipe!");
                 }
 
                 if (args.length > 2 && player.hasPermission("thonkcrafting.edit.recipe")) {
-                    convertToThonkCraftingRecipe = Boolean.parseBoolean(args[2]);
+                    if (args[2].equalsIgnoreCase("convert")) {
+                        convertToThonkCraftingRecipe = true;
+                    } else {
+                        convertToThonkCraftingRecipe = Boolean.parseBoolean(args[2]);
+                    }
+                } else {
+                    player.sendMessage("You do not have permission to convert the recipe!");
                 }
 
-                new RecipeCreatorMenu(recipe, commandSender, editRecipe, convertToThonkCraftingRecipe);
+                new RecipeMenus(recipe, commandSender, editRecipe, convertToThonkCraftingRecipe);
             }
 
         }
@@ -76,10 +87,20 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
             copyPartialMatches(commandPiece, recipeKeys, completedList);
         }
 
+        if (args.length == 2) {
+            String commandPiece = args[1];
+            copyPartialMatches(commandPiece, Arrays.asList("edit", "true", "false"), completedList);
+        }
+
+        if (args.length == 3) {
+            String commandPiece = args[2];
+            copyPartialMatches(commandPiece, Arrays.asList("convert", "true", "false"), completedList);
+        }
+
         return completedList;
     }
 
-    public static <T extends Collection<? super String>> T copyPartialMatches(String token, Iterable<String> originals, T collection) throws UnsupportedOperationException, IllegalArgumentException {
+    private static <T extends Collection<? super String>> T copyPartialMatches(String token, Iterable<String> originals, T collection) throws UnsupportedOperationException, IllegalArgumentException {
         for (String string : originals) {
             if (containsIgnoreCase(string, token)) {
                 collection.add(string);

@@ -3,6 +3,8 @@ package com.epherical.crafting;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.epherical.crafting.commands.RecipeCommand;
+import com.epherical.crafting.commands.RecipeCreator;
+import com.epherical.crafting.commands.RecipeRemover;
 import com.epherical.crafting.config.ConfigManager;
 import com.epherical.crafting.config.MainConfig;
 import com.epherical.crafting.listener.CookingBlockListener;
@@ -58,8 +60,15 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
 
         RecipeCommand command = new RecipeCommand(this);
-        getCommand("bingo").setExecutor(command);
-        getCommand("bingo").setTabCompleter(command);
+        getCommand("recipe").setExecutor(command);
+        getCommand("recipe").setTabCompleter(command);
+        RecipeCreator creator = new RecipeCreator();
+        getCommand("create").setExecutor(creator);
+        getCommand("create").setTabCompleter(creator);
+        RecipeRemover remover = new RecipeRemover();
+        getCommand("remove").setExecutor(remover);
+        getCommand("remove").setTabCompleter(remover);
+
 
     }
 

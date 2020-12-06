@@ -350,6 +350,18 @@ public class RecipeGenerator {
                 CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, CraftingRegistry.BLASTING_SERIALIZER, false);
     }
 
+    public static CookingRecipeToJson createCookingRecipe(NamespacedKey recipeKey, String group, org.bukkit.inventory.ItemStack input,
+                                                          org.bukkit.inventory.ItemStack result, float experience, int cookingTime, NamespacedKey recipeSerializerKey) {
+        RecipeSerializer<?> serializer = IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(recipeSerializerKey));
+        boolean vanillaRecipe = false;
+        if (recipeSerializerKey.getNamespace().startsWith("minecraft")) {
+            vanillaRecipe = true;
+        }
+
+        return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(recipeKey), group,
+                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, serializer, vanillaRecipe);
+    }
+
     public static CookingRecipeToJson createVanillaCampfireRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input,
                                                    org.bukkit.inventory.ItemStack result, float experience, int cookTime) {
 

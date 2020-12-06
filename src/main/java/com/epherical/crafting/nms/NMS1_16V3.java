@@ -24,6 +24,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -236,5 +238,13 @@ public class NMS1_16V3 implements NMSInterface {
             e.printStackTrace();
         }
         return recipeItemStack;
+    }
+
+    public Set<NamespacedKey> getRecipeSerializers() {
+        return IRegistry.RECIPE_SERIALIZER.keySet().stream().map(CraftNamespacedKey::fromMinecraft).collect(Collectors.toSet());
+    }
+
+    public Object getRecipeSerializer(NamespacedKey key) {
+        return IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(key));
     }
 }

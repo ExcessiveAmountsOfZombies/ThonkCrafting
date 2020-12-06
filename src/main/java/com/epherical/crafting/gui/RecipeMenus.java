@@ -1,5 +1,6 @@
 package com.epherical.crafting.gui;
 
+import com.epherical.crafting.CraftingRegistry;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.recipes.RecipeGenerator;
 import com.epherical.crafting.recipes.RecipeToJson;
@@ -19,45 +20,55 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RecipeCreatorMenu {
+public class RecipeMenus {
 
 
-    public RecipeCreatorMenu(Recipe recipe, CommandSender sender, boolean edit, boolean convertToThonkCraftingRecipe) {
+    public RecipeMenus(Recipe recipe, CommandSender sender, boolean edit, boolean convertToThonkCraftingRecipe) {
         if (recipe instanceof CustomRecipe) {
             // TODO: add in ability to add options to the recipe.
             CustomRecipe recipe1 = (CustomRecipe) recipe;
             recipe1.getOptions();
         }
 
+        Menu menu = null;
+
         // TODO: how can i improve this, it's ugly and kinda repetitive.
         if (recipe instanceof ShapedRecipe) {
             // VANILLA RECIPE
             ShapedRecipe cast = (ShapedRecipe) recipe;
-            createCraftingMenu(cast.getKey(), cast.getGroup(), shapedRecipeMenu(cast.getIngredientMap(),
-                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", sender, edit, true, !convertToThonkCraftingRecipe);
+            menu = createCraftingMenu(cast.getKey(), cast.getGroup(), shapedRecipeMenu(cast.getIngredientMap(),
+                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", edit, true, !convertToThonkCraftingRecipe);
         } else if (recipe instanceof RecipeShaped) {
             // THONKCRAFTING RECIPE
             RecipeShaped cast = (RecipeShaped) recipe;
-            createCraftingMenu(cast.getKey(), cast.getGroup(), shapedRecipeMenu(cast.getIngredientMap(),
-                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", sender, edit, true, false);
+            menu = createCraftingMenu(cast.getKey(), cast.getGroup(), shapedRecipeMenu(cast.getIngredientMap(),
+                    cast.getShape(), edit), cast.getResult(), edit ? "Shaped Recipe Editor" : "Shaped Recipe Viewer", edit, true, false);
         } else if (recipe instanceof ShapelessRecipe) {
             // VANILLA RECIPE
             ShapelessRecipe cast = (ShapelessRecipe) recipe;
-            createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
-                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", sender, edit, false, !convertToThonkCraftingRecipe);
+            menu = createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
+                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", edit, false, !convertToThonkCraftingRecipe);
         } else if (recipe instanceof RecipeShapeless) {
             // THONKCRAFTING RECIPE
             RecipeShapeless cast = (RecipeShapeless) recipe;
-            createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
-                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", sender, edit, false, false);
+            menu = createCraftingMenu(cast.getKey(), cast.getGroup(), shapelessRecipeMenu(cast.getIngredientList(),
+                    edit), cast.getResult(), edit ? "Shapeless Recipe Editor" : "Shapeless Recipe Viewer", edit, false, false);
         } else if (recipe instanceof CookingRecipe ) { // the blob of code that makes your eyes glaze over
             // VANILLA RECIPE
             CookingRecipe<?> cast = (CookingRecipe<?>) recipe;
-            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast, convertToThonkCraftingRecipe);
+            NamespacedKey key;
+            if (convertToThonkCraftingRecipe) {
+                Class<?> customRecipeClass = CraftingRegistry.baseToCustomClass.get(cast.getClass().getName());
+                key = CraftingRegistry.recipeClassSerializerMap.get(customRecipeClass.getName());
+            } else {
+                key = CraftingRegistry.recipeClassSerializerMap.get(cast.getClass().getName());
+            }
+            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key);
         } else if (recipe instanceof AbstractCooking) {
             // THONKCRAFTING RECIPE
             AbstractCooking cast = (AbstractCooking) recipe;
-            createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", sender, edit, cast, false);
+            NamespacedKey key = CraftingRegistry.recipeClassSerializerMap.get(cast.getClass().getName());
+            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key);
         } else if (recipe instanceof RecipeSmithing) {
             RecipeSmithing cast = (RecipeSmithing) recipe;
 
@@ -69,15 +80,16 @@ public class RecipeCreatorMenu {
         } else if (recipe instanceof RecipeStonecutting) {
             // THONKCRAFTING RECIPE
             RecipeStonecutting cast = (RecipeStonecutting) recipe;
-            createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", sender, edit, false, cast.getKey(), cast.getGroup());
+            menu = createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", edit, false, cast.getKey(), cast.getGroup());
         } else if (recipe instanceof StonecuttingRecipe) {
             // VANILLA RECIPE
             StonecuttingRecipe cast = (StonecuttingRecipe) recipe;
-            createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", sender, edit, !convertToThonkCraftingRecipe, cast.getKey(), cast.getGroup());
+            menu = createCuttingMenu(cast.getInput(), cast.getResult(), edit ? "Cutting Recipe Editor" : " Cutting Recipe Viewer", edit, !convertToThonkCraftingRecipe, cast.getKey(), cast.getGroup());
         }
+        menu.openInventory((HumanEntity) sender);
     }
 
-    private Map<Integer, MenuButton> shapelessRecipeMenu(List<ItemStack> ingredientList, boolean editingRecipe) {
+    private static Map<Integer, MenuButton> shapelessRecipeMenu(List<ItemStack> ingredientList, boolean editingRecipe) {
         int firstSlot = 11;
         int slotRow = 0;
         int i = 0;
@@ -94,7 +106,7 @@ public class RecipeCreatorMenu {
         return displayedIngredients;
     }
 
-    private Map<Integer, MenuButton> shapedRecipeMenu(Map<Character, ItemStack> ingredients, String[] shape, boolean editingRecipe) {
+    private static Map<Integer, MenuButton> shapedRecipeMenu(Map<Character, ItemStack> ingredients, String[] shape, boolean editingRecipe) {
         Map<Integer, MenuButton> displayedIngredients = new HashMap<>();
         int firstSlot = 11;
         int slotRow = 0;
@@ -109,26 +121,27 @@ public class RecipeCreatorMenu {
         return displayedIngredients;
     }
 
-    private void createCraftingMenu(NamespacedKey key, String group, Map<Integer, MenuButton> ingredients, ItemStack result, String menuName,
-                                    CommandSender sender, boolean editingRecipe, boolean isShapedRecipe, boolean isVanillaRecipe) {
+    public static Menu createCraftingMenu(NamespacedKey key, String group, Map<Integer, MenuButton> ingredients, ItemStack result, String menuName,
+                                          boolean editingRecipe, boolean isShapedRecipe, boolean isVanillaRecipe) {
         Menu.Builder builder = new Menu.Builder(6, menuName, true, Material.BLACK_STAINED_GLASS_PANE)
                 .addMenuButton(24, new MenuButton(event -> event.setCancelled(!editingRecipe), result))
                 .addMenuButton(38, MenuDefaults.defaultCloseButton(38))
                 // TODO: future command block usage
                 .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), Material.COMMAND_BLOCK))
-                .addMenuButtons(new MenuButton(event -> event.setCancelled(!editingRecipe), Material.AIR), 11, 12, 13, 20, 21, 22, 29, 30, 31)
-                .addMenuButtons(ingredients);
+                .addMenuButtons(new MenuButton(event -> event.setCancelled(!editingRecipe), Material.AIR), 11, 12, 13, 20, 21, 22, 29, 30, 31);
+        if (ingredients != null) {
+            builder.addMenuButtons(ingredients);
+        }
         if (editingRecipe) {
             builder.addMenuButton(40, acceptButtonCrafting(key, group, Material.NETHER_STAR, isShapedRecipe, isVanillaRecipe));
         } else {
             builder.addMenuButton(42, new MenuButton(event -> event.setCancelled(true), Material.PRISMARINE_SHARD));
             builder.addMenuButton(43, new MenuButton(event -> event.setCancelled(true), Material.FEATHER));
         }
-        Menu menu = builder.build();
-        menu.openInventory((HumanEntity) sender);
+        return builder.build();
     }
 
-    private void createCookingMenu(ItemStack input, ItemStack result, String menuName, CommandSender sender, boolean editingRecipe, Recipe recipe, boolean convertToThonkCraftingRecipe) {
+    public static Menu createCookingMenu(ItemStack input, ItemStack result, String menuName, boolean editingRecipe, NamespacedKey recipeKey, String group, float exp, int cookingTime, NamespacedKey serializerKey) {
         Menu.Builder builder = new Menu.Builder(6, menuName, true, Material.BLACK_STAINED_GLASS_PANE)
                 .addMenuButton(24, new MenuButton(event -> event.setCancelled(!editingRecipe), result))
                 .addMenuButton(12, new MenuButton(event -> event.setCancelled(!editingRecipe), input))
@@ -136,16 +149,15 @@ public class RecipeCreatorMenu {
                 .addMenuButton(38, MenuDefaults.defaultCloseButton(38))
                 .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), Material.COMMAND_BLOCK));
         if (editingRecipe) {
-            builder.addMenuButton(40, acceptButtonCooking(recipe, Material.NETHER_STAR, convertToThonkCraftingRecipe));
+            builder.addMenuButton(40, acceptButtonCooking(recipeKey, group, exp, cookingTime, Material.NETHER_STAR, serializerKey));
         } else {
             builder.addMenuButton(42, new MenuButton(event -> event.setCancelled(true), Material.PRISMARINE_SHARD));
             builder.addMenuButton(43, new MenuButton(event -> event.setCancelled(true), Material.FEATHER));
         }
-        Menu menu = builder.build();
-        menu.openInventory((HumanEntity) sender);
+        return builder.build();
     }
 
-    private void createCuttingMenu(ItemStack input, ItemStack result, String menuName, CommandSender sender, boolean editingRecipe, boolean isVanillaRecipe, NamespacedKey key, String group) {
+    public static Menu createCuttingMenu(ItemStack input, ItemStack result, String menuName, boolean editingRecipe, boolean isVanillaRecipe, NamespacedKey key, String group) {
         Menu.Builder builder = new Menu.Builder(6, menuName, true, Material.BLACK_STAINED_GLASS_PANE)
                 .addMenuButton(24, new MenuButton(event -> event.setCancelled(!editingRecipe), result))
                 .addMenuButton(21, new MenuButton(event -> event.setCancelled(!editingRecipe), input))
@@ -160,8 +172,23 @@ public class RecipeCreatorMenu {
             builder.addMenuButton(43, new MenuButton(event -> event.setCancelled(true), Material.FEATHER));
         }
 
-        Menu menu = builder.build();
-        menu.openInventory((HumanEntity) sender);
+        return builder.build();
+    }
+
+    public static Menu recipeCreatorMenu(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey) {
+        switch (type) {
+            case COOKING:
+                return createCookingMenu(new ItemStack(Material.AIR), new ItemStack(Material.AIR), menuName, true, key, group, 0.1f, 200, recipeSerializerKey);
+            case CUTTING:
+                return createCuttingMenu(new ItemStack(Material.AIR), new ItemStack(Material.AIR), menuName, true, vanillaRecipe, key, group);
+            case SHAPED:
+                return createCraftingMenu(key, group, null, new ItemStack(Material.AIR), menuName, true, true, vanillaRecipe);
+            case SHAPELESS:
+                return createCraftingMenu(key, group, null, new ItemStack(Material.AIR), menuName, true, false, vanillaRecipe);
+            case SMITHING:
+            default:
+                return null;
+        }
     }
 
     /*private void createSmithingMenu(ItemStack input, ItemStack secondaryInput, ItemStack result, String menuName, CommandSender sender, boolean editingRecipe) {
@@ -178,7 +205,7 @@ public class RecipeCreatorMenu {
         menu.openInventory((HumanEntity) sender);
     }*/
 
-    private MenuButton acceptButtonCooking(Recipe recipe, Material material, boolean convertToThonkCraftingRecipe) {
+    private static MenuButton acceptButtonCooking(NamespacedKey recipeKey, String group, float exp, int cookingTime, Material material, NamespacedKey serializerKey) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName("Accept");
@@ -189,51 +216,7 @@ public class RecipeCreatorMenu {
             ItemStack input = event.getInventory().getItem(12);
             ItemStack result = event.getInventory().getItem(24);
 
-            RecipeToJson json = null;
-
-            // TODO: find a way to not use instanceof trash it looks so ugly and i'm sure there is a better way that makes sense
-
-            if (recipe instanceof RecipeBlasting) {
-                // ThonkCrafting Blasting
-                RecipeBlasting cast = (RecipeBlasting) recipe;
-                json = RecipeGenerator.createCustomBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof RecipeCampfire) {
-                // ThonkCrafting Campfire
-                RecipeCampfire cast = (RecipeCampfire) recipe;
-                json = RecipeGenerator.createCustomCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof RecipeSmoking) {
-                // ThonkCrafting Smoking
-                RecipeSmoking cast = (RecipeSmoking) recipe;
-                json = RecipeGenerator.createCustomSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof RecipeSmelting) {
-                // ThonkCrafting Smelting
-                RecipeSmelting cast = (RecipeSmelting) recipe;
-                json = RecipeGenerator.createCustomSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof BlastingRecipe) {
-                // Vanilla Blasting
-                BlastingRecipe cast = (BlastingRecipe) recipe;
-                json = convertToThonkCraftingRecipe
-                        ? RecipeGenerator.createCustomBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
-                        : RecipeGenerator.createVanillaBlastingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof CampfireRecipe) {
-                // Vanilla Campfire
-                CampfireRecipe cast = (CampfireRecipe) recipe;
-                json = convertToThonkCraftingRecipe
-                        ? RecipeGenerator.createCustomCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
-                        : RecipeGenerator.createVanillaCampfireRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof SmokingRecipe) {
-                // Vanilla Smoking
-                SmokingRecipe cast = (SmokingRecipe) recipe;
-                json = convertToThonkCraftingRecipe
-                        ? RecipeGenerator.createCustomSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
-                        : RecipeGenerator.createVanillaSmokingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            } else if (recipe instanceof FurnaceRecipe) {
-                // Vanilla Smelting
-                FurnaceRecipe cast = (FurnaceRecipe) recipe;
-                json = convertToThonkCraftingRecipe
-                        ? RecipeGenerator.createCustomSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime())
-                        : RecipeGenerator.createVanillaSmeltingRecipe(cast.getKey(), cast.getGroup(), input, result, cast.getExperience(), cast.getCookingTime());
-            }
+            RecipeToJson json = RecipeGenerator.createCookingRecipe(recipeKey, group, input, result, exp, cookingTime, serializerKey);
 
 
             RecipeGenerator.saveRecipeToFile(json);
@@ -241,7 +224,7 @@ public class RecipeCreatorMenu {
         }, itemStack);
     }
 
-    private MenuButton acceptButtonCutting(NamespacedKey key, String group, Material material, boolean isVanillaRecipe) {
+    private static MenuButton acceptButtonCutting(NamespacedKey key, String group, Material material, boolean isVanillaRecipe) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName("Accept");
@@ -267,7 +250,7 @@ public class RecipeCreatorMenu {
     }
 
 
-    private MenuButton acceptButtonCrafting(NamespacedKey key, String group, Material material, boolean isShapedRecipe, boolean isVanillaRecipe) {
+    private static MenuButton acceptButtonCrafting(NamespacedKey key, String group, Material material, boolean isShapedRecipe, boolean isVanillaRecipe) {
         ItemStack itemStack = new ItemStack(material);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName("Accept");

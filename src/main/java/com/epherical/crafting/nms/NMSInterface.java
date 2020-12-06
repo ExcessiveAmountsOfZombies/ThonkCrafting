@@ -9,6 +9,7 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public interface NMSInterface {
@@ -30,4 +31,8 @@ public interface NMSInterface {
     Object createNMSItemStack(JsonObject object);
 
     Object constructRecipeItemStack(Stream<?> object, boolean hasData);
+
+    Set<NamespacedKey> getRecipeSerializers();
+
+    Object getRecipeSerializer(NamespacedKey key);
 }

@@ -8,5 +8,9 @@ depend:
   - ProtocolLib
 load: POSTWORLD
 commands:
-  bingo:
-    usage: yeet
+  recipe:
+    usage: Used to edit or view a recipe.
+  create:
+    usage: Used to create a recipe.
+  remove:
+    usage: Remove a recipe so it can't be crafted.
