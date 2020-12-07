@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.Consumer;
 
+
 public class MenuButton {
     private final Consumer<InventoryClickEvent> clickEvent;
     private ItemStack displayItem;

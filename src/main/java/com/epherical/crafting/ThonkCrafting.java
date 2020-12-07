@@ -7,6 +7,7 @@ import com.epherical.crafting.commands.RecipeCreator;
 import com.epherical.crafting.commands.RecipeRemover;
 import com.epherical.crafting.config.ConfigManager;
 import com.epherical.crafting.config.MainConfig;
+import com.epherical.crafting.listener.ChatListener;
 import com.epherical.crafting.listener.CookingBlockListener;
 import com.epherical.crafting.listener.InventoryListener;
 import com.epherical.crafting.listener.RecipeListener;
@@ -30,6 +31,8 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
     public static final String USED_BY = "used-by";
 
     private static NMSInterface nmsInterface;
+
+    private ChatListener chatListener;
 
     @Override
     public void onLoad() {
@@ -58,6 +61,8 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new RecipeListener(this), this);
         getServer().getPluginManager().registerEvents(new CookingBlockListener(this), this);
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+        chatListener = new ChatListener(this);
+        getServer().getPluginManager().registerEvents(chatListener, this);
 
         RecipeCommand command = new RecipeCommand(this);
         getCommand("recipe").setExecutor(command);
@@ -102,5 +107,9 @@ public class ThonkCrafting extends JavaPlugin implements Listener {
 
     public static NMSInterface getNmsInterface() {
         return nmsInterface;
+    }
+
+    public ChatListener getChatListener() {
+        return chatListener;
     }
 }

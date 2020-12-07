@@ -1,21 +1,26 @@
 package com.epherical.crafting.gui;
 
 import com.epherical.crafting.CraftingRegistry;
+import com.epherical.crafting.ThonkCrafting;
+import com.epherical.crafting.listener.ChatListener;
 import com.epherical.crafting.recipes.CustomRecipe;
 import com.epherical.crafting.recipes.RecipeGenerator;
 import com.epherical.crafting.recipes.RecipeToJson;
 import com.epherical.crafting.recipes.impl.*;
 import com.epherical.crafting.ui.Menu;
 import com.epherical.crafting.ui.MenuDefaults;
+import com.epherical.crafting.ui.click.ContainerButton;
 import com.epherical.crafting.ui.click.MenuButton;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +38,8 @@ public class RecipeMenus {
         Menu menu = null;
 
         // TODO: how can i improve this, it's ugly and kinda repetitive.
+        Player player = (Player) sender;
+
         if (recipe instanceof ShapedRecipe) {
             // VANILLA RECIPE
             ShapedRecipe cast = (ShapedRecipe) recipe;
@@ -63,12 +70,12 @@ public class RecipeMenus {
             } else {
                 key = CraftingRegistry.recipeClassSerializerMap.get(cast.getClass().getName());
             }
-            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key);
+            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key, player);
         } else if (recipe instanceof AbstractCooking) {
             // THONKCRAFTING RECIPE
             AbstractCooking cast = (AbstractCooking) recipe;
             NamespacedKey key = CraftingRegistry.recipeClassSerializerMap.get(cast.getClass().getName());
-            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key);
+            menu = createCookingMenu(cast.getInput(), cast.getResult(), edit ? "Cooking Recipe Editor" : "Cooking Recipe Viewer", edit, cast.getKey(), cast.getGroup(), cast.getExperience(), cast.getCookingTime(), key, player);
         } else if (recipe instanceof RecipeSmithing) {
             RecipeSmithing cast = (RecipeSmithing) recipe;
 
@@ -141,20 +148,71 @@ public class RecipeMenus {
         return builder.build();
     }
 
-    public static Menu createCookingMenu(ItemStack input, ItemStack result, String menuName, boolean editingRecipe, NamespacedKey recipeKey, String group, float exp, int cookingTime, NamespacedKey serializerKey) {
+    public static Menu createCookingMenu(ItemStack input, ItemStack result, String menuName, boolean editingRecipe, NamespacedKey recipeKey, String group, float exp, int cookingTime, NamespacedKey serializerKey, Player player) {
         Menu.Builder builder = new Menu.Builder(6, menuName, true, Material.BLACK_STAINED_GLASS_PANE)
                 .addMenuButton(24, new MenuButton(event -> event.setCancelled(!editingRecipe), result))
                 .addMenuButton(12, new MenuButton(event -> event.setCancelled(!editingRecipe), input))
                 .addMenuButton(30, new MenuButton(event -> event.setCancelled(true), Material.LAVA_BUCKET))
-                .addMenuButton(38, MenuDefaults.defaultCloseButton(38))
-                .addMenuButton(39, new MenuButton(event -> event.setCancelled(true), Material.COMMAND_BLOCK));
+                .addMenuButton(38, MenuDefaults.defaultCloseButton(38));
         if (editingRecipe) {
+            builder.addMenuButton(39, editCookingRecipe(recipeKey, input, result, group, exp, cookingTime, Material.COMMAND_BLOCK, serializerKey, player));
             builder.addMenuButton(40, acceptButtonCooking(recipeKey, group, exp, cookingTime, Material.NETHER_STAR, serializerKey));
         } else {
+            builder.addMenuButton(39, new MenuButton(event -> event.setCancelled(true), Material.COMMAND_BLOCK));
             builder.addMenuButton(42, new MenuButton(event -> event.setCancelled(true), Material.PRISMARINE_SHARD));
             builder.addMenuButton(43, new MenuButton(event -> event.setCancelled(true), Material.FEATHER));
         }
         return builder.build();
+    }
+
+    private static MenuButton editCookingRecipe(NamespacedKey recipeKey, ItemStack input, ItemStack result, String group, float exp, int cookingTime, Material material, NamespacedKey serializerKey, Player player) {
+        ItemStack itemStack = new ItemStack(material);
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setDisplayName("Current Properties");
+        meta.setLore(Arrays.asList("Cooking Properties", "Experience: " + exp, "Cooking Time: " + cookingTime));
+        itemStack.setItemMeta(meta);
+
+        return new MenuButton(event -> {
+            event.setCancelled(true);
+            Menu.Builder builder = new Menu.Builder(6, "Edit Cooking Properties", true, Material.BLACK_STAINED_GLASS_PANE);
+            ContainerButton<Number> experienceButton = new ContainerButton<>(event1 -> {
+                event1.setCancelled(true);
+                Menu menu = (Menu) event1.getInventory().getHolder();
+                ContainerButton<Number> button = (ContainerButton<Number>) menu.getConsumableSlots().get(event1.getRawSlot());
+                ChatListener listener = ThonkCrafting.getInstance().getChatListener();
+
+                listener.addResponseRequest(event1.getWhoClicked().getUniqueId(), button);
+                listener.addSavedMenu(event1.getWhoClicked().getUniqueId(), menu);
+                event1.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            }, Material.EXPERIENCE_BOTTLE, exp);
+            
+            ContainerButton<Number> timeButton = new ContainerButton<>(event1 -> {
+                event1.setCancelled(true);
+                Menu menu = (Menu) event1.getInventory().getHolder();
+                ContainerButton<Number> button = (ContainerButton<Number>) menu.getConsumableSlots().get(event1.getRawSlot());
+                ThonkCrafting.getInstance().getChatListener().addResponseRequest(event1.getWhoClicked().getUniqueId(), button);
+
+                ChatListener listener = ThonkCrafting.getInstance().getChatListener();
+
+                listener.addResponseRequest(event1.getWhoClicked().getUniqueId(), button);
+                listener.addSavedMenu(event1.getWhoClicked().getUniqueId(), menu);
+
+                event1.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            }, Material.LAVA_BUCKET, cookingTime);
+
+
+            builder.addMenuButton(11, experienceButton);
+            builder.addMenuButton(12, timeButton);
+
+            builder.addMenuButton(31, new MenuButton(event1 -> {
+                event1.setCancelled(true);
+                float experience = experienceButton.getContainer().floatValue();
+                int time = timeButton.getContainer().intValue();
+                createCookingMenu(input, result, "Cooking Recipe Editor", true, recipeKey, group, experience, time, serializerKey, player).openInventory(player);
+            }, Material.NETHER_STAR));
+
+            builder.build().openInventory(player);
+        }, itemStack);
     }
 
     public static Menu createCuttingMenu(ItemStack input, ItemStack result, String menuName, boolean editingRecipe, boolean isVanillaRecipe, NamespacedKey key, String group) {
@@ -175,10 +233,10 @@ public class RecipeMenus {
         return builder.build();
     }
 
-    public static Menu recipeCreatorMenu(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey) {
+    public static Menu recipeCreatorMenu(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey, Player player) {
         switch (type) {
             case COOKING:
-                return createCookingMenu(new ItemStack(Material.AIR), new ItemStack(Material.AIR), menuName, true, key, group, 0.1f, 200, recipeSerializerKey);
+                return createCookingMenu(new ItemStack(Material.AIR), new ItemStack(Material.AIR), menuName, true, key, group, 0.1f, 200, recipeSerializerKey, player);
             case CUTTING:
                 return createCuttingMenu(new ItemStack(Material.AIR), new ItemStack(Material.AIR), menuName, true, vanillaRecipe, key, group);
             case SHAPED:

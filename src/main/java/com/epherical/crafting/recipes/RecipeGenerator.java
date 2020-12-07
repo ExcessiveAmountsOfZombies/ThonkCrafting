@@ -337,6 +337,11 @@ public class RecipeGenerator {
                 CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, serializer, vanillaRecipe);
     }
 
+    public static SingleItemRecipeToJson createCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, NamespacedKey recipeSerializerKey) {
+        RecipeSerializer<?> serializer = IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(recipeSerializerKey));
+        return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), false);
+    }
+
     public static RecipeShapelessToJson createVanillaShapelessRecipe(NamespacedKey key, org.bukkit.inventory.ItemStack result, int outputAmount,
                                                     String group, Collection<org.bukkit.inventory.ItemStack> ingredients) {
         List<ItemStack> recipeItemStacks = ingredients.stream().map(CraftItemStack::asNMSCopy).collect(Collectors.toList());

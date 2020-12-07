@@ -1,19 +1,18 @@
 package com.epherical.crafting;
 
 import com.epherical.crafting.gui.RecipeMenus;
+import com.epherical.crafting.recipes.impl.*;
 import com.epherical.crafting.recipes.impl.RecipeBlasting;
 import com.epherical.crafting.recipes.impl.RecipeCampfire;
-import com.epherical.crafting.recipes.impl.RecipeSmelting;
 import com.epherical.crafting.recipes.impl.RecipeSmoking;
+import com.epherical.crafting.recipes.impl.RecipeStonecutting;
 import com.epherical.crafting.recipes.internal.*;
 import com.epherical.crafting.ui.Menu;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.NamespacedKey;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftBlastingRecipe;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftCampfireRecipe;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftFurnaceRecipe;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftSmokingRecipe;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.*;
 import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -101,10 +100,20 @@ public class CraftingRegistry {
         recipeTypeMap.put(RecipeSerializer.t, RecipeType.CUTTING);
         recipeTypeMap.put(STONECUTTING_SERIALIZER, RecipeType.CUTTING);
 
+        recipeClassSerializerMap.put(RecipeShaped.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SHAPED_SERIALIZER)));
+        recipeClassSerializerMap.put(RecipeShapeless.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SHAPELESS_SERIALIZER)));
+
+        recipeClassSerializerMap.put(RecipeStonecutting.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(STONECUTTING_SERIALIZER)));
+
         recipeClassSerializerMap.put(RecipeBlasting.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(BLASTING_SERIALIZER)));
         recipeClassSerializerMap.put(RecipeCampfire.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(CAMPFIRE_SERIALIZER)));
         recipeClassSerializerMap.put(RecipeSmoking.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SMOKING_SERIALIZER)));
         recipeClassSerializerMap.put(RecipeSmelting.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(SMELTING_SERIALIZER)));
+
+        recipeClassSerializerMap.put(CraftShapedRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.a)));
+        recipeClassSerializerMap.put(CraftShapelessRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.b)));
+
+        recipeClassSerializerMap.put(CraftStonecuttingRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.t)));
 
         recipeClassSerializerMap.put(CraftBlastingRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.q)));
         recipeClassSerializerMap.put(CraftCampfireRecipe.class.getName(), CraftNamespacedKey.fromMinecraft(IRegistry.RECIPE_SERIALIZER.getKey(RecipeSerializer.s)));
@@ -130,7 +139,7 @@ public class CraftingRegistry {
     }
 
     public interface RecipeCreator<T extends Menu> {
-        T create(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey);
+        T create(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey, Player player);
     }
 
     public enum RecipeType {
