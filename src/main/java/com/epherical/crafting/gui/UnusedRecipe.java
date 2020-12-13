@@ -31,10 +31,10 @@ public class UnusedRecipe {
             information.addAll(((CustomRecipe) recipe).getOptionComponent());
         }
 
-        MenuButton paperButton = new MenuButton(event -> event.setCancelled(true), ItemUtil.createDisplayItemComponent(new ItemStack(Material.PAPER, 1), information));
+        //MenuButton paperButton = new MenuButton(event -> event.setCancelled(true), ItemUtil.createDisplayItemComponent(new ItemStack(Material.PAPER, 1), information));
 
         // TODO this is terrible to do could be improved
-        if (recipe instanceof ShapedRecipe) {
+        /*if (recipe instanceof ShapedRecipe) {
             ShapedRecipe shapedRecipe = (ShapedRecipe) recipe;
             createCraftingMenu(shapedRecipeMenu(shapedRecipe.getIngredientMap(), shapedRecipe.getShape()), paperButton, commandSender, recipe.getResult());
         } else if (recipe instanceof RecipeShaped) {
@@ -61,7 +61,7 @@ public class UnusedRecipe {
         } else if (recipe instanceof SmithingRecipe) {
             SmithingRecipe smith = (SmithingRecipe) recipe;
             createSmithingMenu(smith.getBase().getItemStack(), smith.getAddition().getItemStack(), smith.getResult(), paperButton, commandSender);
-        } /*else if (recipe instanceof RecipeSmithing) {
+        } *//*else if (recipe instanceof RecipeSmithing) {
                 RecipeSmithing smith = (RecipeSmithing) recipe;
                 createSmithingMenu(smith.getBase().getItemStack(), smithing.getAddition().getItemStack(), smithing.getResult(), paperButton, commandSender);
             }*/

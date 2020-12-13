@@ -17,12 +17,12 @@ public class ItemUtil {
         return item.clone();
     }
 
-    public static ItemStack createDisplayItemComponent(ItemStack item, List<BaseComponent[]> lore) {
+    /*public static ItemStack createDisplayItemComponent(ItemStack item, List<BaseComponent[]> lore) {
         ItemMeta meta = item.getItemMeta();
         meta.setLoreComponents(lore);
         item.setItemMeta(meta);
         return item.clone();
-    }
+    }*/
 
     public static ItemStack createContainerItem(Material material, String name, String... lore) {
         ItemStack itemStack = new ItemStack(material);

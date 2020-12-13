@@ -69,7 +69,7 @@ public class RecipeShapeless implements CraftRecipe, CustomRecipe {
         return this;
     }
 
-    public RecipeShapeless addIngredient(ItemStack item) {
+    /*public RecipeShapeless addIngredient(ItemStack item) {
         this.bukkitRecipe.addIngredient(item);
         return this;
     }
@@ -87,7 +87,7 @@ public class RecipeShapeless implements CraftRecipe, CustomRecipe {
     public RecipeShapeless removeIngredient(int count, ItemStack item) {
         this.bukkitRecipe.removeIngredient(count, item);
         return this;
-    }
+    }*/
 
     public RecipeShapeless removeIngredient(RecipeChoice ingredient) {
         this.bukkitRecipe.removeIngredient(ingredient);

@@ -43,7 +43,7 @@ public class InternalDamageDurabilityRecipe implements RecipeCrafting {
 
     @Override
     public NonNullList<ItemStack> b(InventoryCrafting inventory) {
-        NonNullList<ItemStack> defaultedList = NonNullList.a(inventory.getSize(), ItemStack.NULL_ITEM);
+        NonNullList<ItemStack> defaultedList = NonNullList.a(inventory.getSize(), ItemStack.b);
 
         for(int i = 0; i < defaultedList.size(); ++i) {
             ItemStack itemStack = inventory.getItem(i);
@@ -105,8 +105,8 @@ public class InternalDamageDurabilityRecipe implements RecipeCrafting {
 
         @Override
         public InternalDamageDurabilityRecipe a(MinecraftKey minecraftkey, PacketDataSerializer packetdataserializer) {
-            String string = packetdataserializer.readUTF(32767);
-            int i = packetdataserializer.readVarInt();
+            String string = packetdataserializer.e(32767);
+            int i = packetdataserializer.i();
             NonNullList<RecipeItemStack> defaultedList = NonNullList.a(i, RecipeItemStack.a);
 
             for(int j = 0; j < defaultedList.size(); ++j) {

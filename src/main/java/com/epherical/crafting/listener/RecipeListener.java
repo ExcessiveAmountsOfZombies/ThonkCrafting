@@ -104,7 +104,7 @@ public class RecipeListener implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getClickedInventory() instanceof StonecutterInventory) {
             StonecutterInventory inventory = (StonecutterInventory) event.getClickedInventory();
-            ItemStack result = inventory.getResult();
+            ItemStack result = inventory.getItem(2);
             ItemStack inventoryItem = inventory.getItem(event.getSlot());
             if (result != null) {
                 if (result.equals(inventoryItem)) {

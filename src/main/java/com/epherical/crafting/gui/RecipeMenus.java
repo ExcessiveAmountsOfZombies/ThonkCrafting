@@ -236,7 +236,7 @@ public class RecipeMenus {
 
 
             RecipeGenerator.saveRecipeToFile(json);
-            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            event.getWhoClicked().closeInventory();
         }, itemStack);
     }
 
@@ -261,7 +261,7 @@ public class RecipeMenus {
 
 
             RecipeGenerator.saveRecipeToFile(json);
-            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            event.getWhoClicked().closeInventory();
         }, itemStack);
     }
 
@@ -312,7 +312,7 @@ public class RecipeMenus {
             }
 
             RecipeGenerator.saveRecipeToFile(json);
-            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            event.getWhoClicked().closeInventory();
         }, itemStack);
     }
 
@@ -372,6 +372,6 @@ public class RecipeMenus {
 
         event.getWhoClicked().sendMessage("Enter in chat a(n): " + type);
 
-        event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+        event.getWhoClicked().closeInventory();
     }
 }

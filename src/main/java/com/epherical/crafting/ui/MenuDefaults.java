@@ -29,7 +29,7 @@ public class MenuDefaults<C> {
     public static MenuButton closeButton(ItemStack itemStack, int slot) {
         return new MenuButton(event -> {
             event.setCancelled(true);
-            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            event.getWhoClicked().closeInventory();
         }, itemStack);
     }
 
@@ -40,7 +40,7 @@ public class MenuDefaults<C> {
         itemStack.setItemMeta(meta);
         return new MenuButton(event -> {
             event.setCancelled(true);
-            event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
+            event.getWhoClicked().closeInventory();
         }, itemStack);
     }
 

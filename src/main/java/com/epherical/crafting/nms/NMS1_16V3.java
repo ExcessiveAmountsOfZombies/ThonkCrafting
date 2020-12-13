@@ -116,13 +116,13 @@ public class NMS1_16V3 implements NMSInterface {
             recipes = manager.craft(Recipes.CAMPFIRE_COOKING, tile.getTileEntity()., ((CraftWorld) world).getHandle()).orElse(null);
         }*/ if (block instanceof BlastFurnace) {
             CraftBlockEntityState<TileEntityBlastFurnace> tile = (CraftBlockEntityState<TileEntityBlastFurnace>) block;
-            recipes = manager.craft(Recipes.BLASTING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+            recipes = manager.craft(Recipes.BLASTING, getTileEntity(tile), ((CraftWorld) world).getHandle()).orElse(null);
         } else if (block instanceof Smoker) {
             CraftBlockEntityState<TileEntitySmoker> tile = (CraftBlockEntityState<TileEntitySmoker>) block;
-            recipes = manager.craft(Recipes.SMOKING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+            recipes = manager.craft(Recipes.SMOKING, getTileEntity(tile), ((CraftWorld) world).getHandle()).orElse(null);
         } else if (block instanceof Furnace) {
             CraftBlockEntityState<TileEntityFurnaceFurnace> tile = (CraftBlockEntityState<TileEntityFurnaceFurnace>) block;
-            recipes = manager.craft(Recipes.SMELTING, tile.getTileEntity(), ((CraftWorld) world).getHandle()).orElse(null);
+            recipes = manager.craft(Recipes.SMELTING, getTileEntity(tile), ((CraftWorld) world).getHandle()).orElse(null);
         }
 
         return recipes != null ? recipes.toBukkitRecipe() : null;
@@ -246,5 +246,17 @@ public class NMS1_16V3 implements NMSInterface {
 
     public Object getRecipeSerializer(NamespacedKey key) {
         return IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(key));
+    }
+
+    public IInventory getTileEntity(CraftBlockEntityState<?> state) {
+        TileEntity entity = null;
+        try {
+            Method method = state.getClass().getMethod("getTileEntity");
+            method.setAccessible(true);
+            entity = (TileEntity) method.invoke(state);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return (IInventory) entity;
     }
 }
