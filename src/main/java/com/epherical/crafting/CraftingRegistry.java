@@ -1,6 +1,7 @@
 package com.epherical.crafting;
 
 import com.epherical.crafting.gui.RecipeMenus;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.impl.*;
 import com.epherical.crafting.recipes.impl.RecipeBlasting;
 import com.epherical.crafting.recipes.impl.RecipeCampfire;
@@ -15,6 +16,7 @@ import org.bukkit.craftbukkit.v1_16_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CraftingRegistry {
@@ -139,7 +141,7 @@ public class CraftingRegistry {
     }
 
     public interface RecipeCreator<T extends Menu> {
-        T create(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey, Player player);
+        T create(String menuName, NamespacedKey key, String group, CraftingRegistry.RecipeType type, boolean vanillaRecipe, NamespacedKey recipeSerializerKey, Player player, List<Options> optionsList);
     }
 
     public enum RecipeType {

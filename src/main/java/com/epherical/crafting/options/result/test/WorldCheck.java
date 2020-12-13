@@ -39,4 +39,10 @@ public class WorldCheck extends TestOptions {
         builder.append(world).color(ChatColor.GRAY).italic(false);
         return builder.create();
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        super.serialize(object);
+        object.addProperty("world-to-check", world);
+    }
 }

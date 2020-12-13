@@ -8,7 +8,6 @@ import net.minecraft.server.v1_16_R3.IRecipe;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.stream.Collectors;
 

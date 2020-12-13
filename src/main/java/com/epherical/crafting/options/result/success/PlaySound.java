@@ -35,4 +35,11 @@ public class PlaySound extends SuccessOptions {
     public String toString() {
         return "Will play sound: " + sound + " at " + volume + " volume and " + pitch + " pitch";
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        object.addProperty("sound", sound);
+        object.addProperty("volume", volume);
+        object.addProperty("pitch", pitch);
+    }
 }

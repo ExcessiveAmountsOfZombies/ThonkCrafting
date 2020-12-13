@@ -46,8 +46,6 @@ public class ChatListener implements Listener {
                 savedMenu.get(uuid).openInventory(event.getPlayer());
                 removeSavedMenu(uuid);
             });
-
-
         }
     }
 

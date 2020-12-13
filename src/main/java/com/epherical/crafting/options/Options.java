@@ -14,4 +14,6 @@ public abstract class Options {
     public BaseComponent[] textDisplay() {
         return new BaseComponent[]{};
     }
+
+    public abstract void serialize(JsonObject object);
 }

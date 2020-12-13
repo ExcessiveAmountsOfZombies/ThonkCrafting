@@ -2,7 +2,9 @@ package com.epherical.crafting.recipes;
 
 
 import com.epherical.crafting.CraftingRegistry;
+import com.epherical.crafting.OptionRegister;
 import com.epherical.crafting.ThonkCrafting;
+import com.epherical.crafting.options.Options;
 import com.epherical.crafting.recipes.internal.InternalRecipeStonecutting;
 import com.epherical.crafting.recipes.nbt.JsonToNBT;
 import com.google.gson.JsonArray;
@@ -58,19 +60,21 @@ public class RecipeGenerator {
         private final String[] shape;
         private Map<Character, ItemStack> input;
         private boolean vanillaRecipe;
+        private List<Options> options;
 
-        public RecipeShapedToJson(MinecraftKey key, ItemStack result, String group, String[] shape, Map<Character, ItemStack> input, boolean vanillaRecipe) {
+        public RecipeShapedToJson(MinecraftKey key, ItemStack result, String group, String[] shape, Map<Character, ItemStack> input, boolean vanillaRecipe, List<Options> options) {
             this.key = key;
             this.result = result;
             this.group = group;
             this.shape = shape;
             this.input = input;
             this.vanillaRecipe = vanillaRecipe;
+            this.options = options;
         }
 
         public RecipeShapedToJson(NamespacedKey key, org.bukkit.inventory.ItemStack result,
-                                  String group, String[] shape, Map<Character, org.bukkit.inventory.ItemStack> input, boolean vanillaRecipe) {
-            this(CraftNamespacedKey.toMinecraft(key), CraftItemStack.asNMSCopy(result), group, shape, null, vanillaRecipe);
+                                  String group, String[] shape, Map<Character, org.bukkit.inventory.ItemStack> input, boolean vanillaRecipe, List<Options> options) {
+            this(CraftNamespacedKey.toMinecraft(key), CraftItemStack.asNMSCopy(result), group, shape, null, vanillaRecipe, options);
             Map<Character, ItemStack> nmsMap = new HashMap<>();
             input.forEach((character, itemStack) -> nmsMap.put(character, CraftItemStack.asNMSCopy(itemStack)));
             this.input = nmsMap;
@@ -112,6 +116,11 @@ public class RecipeGenerator {
                 result.addProperty("count", this.result.getCount());
             }
 
+            if (!vanillaRecipe) {
+                OptionRegister.serializeOptions(object, options);
+            }
+
+
             object.add("result", result);
         }
 
@@ -135,17 +144,19 @@ public class RecipeGenerator {
         private String group;
         private List<ItemStack> input;
         private boolean vanillaRecipe;
+        private List<Options> options;
 
-        public RecipeShapelessToJson(MinecraftKey key, ItemStack result, String group, List<ItemStack> input, boolean vanillaRecipe) {
+        public RecipeShapelessToJson(MinecraftKey key, ItemStack result, String group, List<ItemStack> input, boolean vanillaRecipe, List<Options> options) {
             this.key = key;
             this.result = result;
             this.group = group;
             this.input = input;
             this.vanillaRecipe = vanillaRecipe;
+            this.options = options;
         }
 
-        public RecipeShapelessToJson(NamespacedKey key, org.bukkit.inventory.ItemStack result, String group, Collection<org.bukkit.inventory.ItemStack> input, boolean vanillaRecipe) {
-            this(CraftNamespacedKey.toMinecraft(key), CraftItemStack.asNMSCopy(result), group, input.stream().map(CraftItemStack::asNMSCopy).collect(Collectors.toList()), vanillaRecipe);
+        public RecipeShapelessToJson(NamespacedKey key, org.bukkit.inventory.ItemStack result, String group, Collection<org.bukkit.inventory.ItemStack> input, boolean vanillaRecipe, List<Options> options) {
+            this(CraftNamespacedKey.toMinecraft(key), CraftItemStack.asNMSCopy(result), group, input.stream().map(CraftItemStack::asNMSCopy).collect(Collectors.toList()), vanillaRecipe, options);
         }
 
         @Override
@@ -178,6 +189,10 @@ public class RecipeGenerator {
                 result.addProperty("count", this.result.getCount());
             }
 
+            if (!vanillaRecipe) {
+                OptionRegister.serializeOptions(object, options);
+            }
+
             object.add("result", result);
 
         }
@@ -204,10 +219,11 @@ public class RecipeGenerator {
         private final int cookingTime;
         private final RecipeSerializer<?> serializer;
         private boolean vanillaRecipe;
+        private List<Options> options;
 
 
         public CookingRecipeToJson(MinecraftKey key, String group, ItemStack input, ItemStack result, float experience,
-                                   int cookingTime, RecipeSerializer<?> serializer, boolean vanillaRecipe) {
+                                   int cookingTime, RecipeSerializer<?> serializer, boolean vanillaRecipe, List<Options> options) {
             this.key = key;
             this.group = group;
             this.input = input;
@@ -216,13 +232,14 @@ public class RecipeGenerator {
             this.cookingTime = cookingTime;
             this.serializer = serializer;
             this.vanillaRecipe = vanillaRecipe;
+            this.options = options;
         }
 
 
         @Override
-        public void serializeRecipe(JsonObject json) {
+        public void serializeRecipe(JsonObject object) {
             if (!this.group.isEmpty()) {
-                json.addProperty("group", this.group);
+                object.addProperty("group", this.group);
             }
 
             RecipeItemStack itemStack = RecipeItemStack.a(Stream.of(input));
@@ -234,7 +251,7 @@ public class RecipeGenerator {
                 addNBTData(ingredient, input.getTag());
             }
 
-            json.add("ingredient", ingredient);
+            object.add("ingredient", ingredient);
             JsonObject result = new JsonObject();
 
             if (!vanillaRecipe) {
@@ -246,12 +263,17 @@ public class RecipeGenerator {
                 if (this.result.getCount() > 1) {
                     result.addProperty("count", this.result.getCount());
                 }
-                json.add("result", result);
+                object.add("result", result);
             } else {
-                json.addProperty("result", IRegistry.ITEM.getKey(this.result.getItem()).toString());
+                object.addProperty("result", IRegistry.ITEM.getKey(this.result.getItem()).toString());
             }
-            json.addProperty("experience", this.experience);
-            json.addProperty("cookingtime", this.cookingTime);
+
+            if (!vanillaRecipe) {
+                OptionRegister.serializeOptions(object, options);
+            }
+
+            object.addProperty("experience", this.experience);
+            object.addProperty("cookingtime", this.cookingTime);
         }
 
         @Override
@@ -272,21 +294,23 @@ public class RecipeGenerator {
         private final ItemStack input;
         private final ItemStack result;
         private final boolean vanillaRecipe;
+        private List<Options> options;
 
 
-        public SingleItemRecipeToJson(MinecraftKey key, RecipeSerializer<?> serializer, String group, ItemStack input, ItemStack result, boolean vanillaRecipe) {
+        public SingleItemRecipeToJson(MinecraftKey key, RecipeSerializer<?> serializer, String group, ItemStack input, ItemStack result, boolean vanillaRecipe, List<Options> options) {
             this.key = key;
             this.serializer = serializer;
             this.group = group;
             this.input = input;
             this.result = result;
             this.vanillaRecipe = vanillaRecipe;
+            this.options = options;
         }
 
         @Override
-        public void serializeRecipe(JsonObject json) {
+        public void serializeRecipe(JsonObject object) {
             if (!this.group.isEmpty()) {
-                json.addProperty("group", this.group);
+                object.addProperty("group", this.group);
             }
 
             RecipeItemStack itemStack = RecipeItemStack.a(Stream.of(input));
@@ -298,7 +322,7 @@ public class RecipeGenerator {
                 addNBTData(ingredient, input.getTag());
             }
 
-            json.add("ingredient", ingredient);
+            object.add("ingredient", ingredient);
             JsonObject result = new JsonObject();
             if (!vanillaRecipe) {
                 result.addProperty("item", IRegistry.ITEM.getKey(this.result.getItem()).toString());
@@ -308,10 +332,12 @@ public class RecipeGenerator {
                 if (this.result.getCount() > 1) {
                     result.addProperty("count", this.result.getCount());
                 }
-                json.add("result", result);
+                object.add("result", result);
+
+                OptionRegister.serializeOptions(object, options);
             } else {
-                json.addProperty("result", IRegistry.ITEM.getKey(this.result.getItem()).toString());
-                json.addProperty("count", this.result.getCount());
+                object.addProperty("result", IRegistry.ITEM.getKey(this.result.getItem()).toString());
+                object.addProperty("count", this.result.getCount());
             }
         }
 
@@ -327,38 +353,38 @@ public class RecipeGenerator {
     }
 
     public static CookingRecipeToJson createCookingRecipe(NamespacedKey recipeKey, String group, org.bukkit.inventory.ItemStack input,
-                                                          org.bukkit.inventory.ItemStack result, float experience, int cookingTime, NamespacedKey recipeSerializerKey) {
+                                                          org.bukkit.inventory.ItemStack result, float experience, int cookingTime, NamespacedKey recipeSerializerKey, List<Options> options) {
         RecipeSerializer<?> serializer = IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(recipeSerializerKey));
         boolean vanillaRecipe = false;
         if (recipeSerializerKey.getNamespace().startsWith("minecraft")) {
             vanillaRecipe = true;
         }
         return new CookingRecipeToJson(CraftNamespacedKey.toMinecraft(recipeKey), group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, serializer, vanillaRecipe);
+                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(result), experience, cookingTime, serializer, vanillaRecipe, options);
     }
 
-    public static SingleItemRecipeToJson createCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, NamespacedKey recipeSerializerKey) {
+    public static SingleItemRecipeToJson createCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, NamespacedKey recipeSerializerKey, List<Options> options) {
         RecipeSerializer<?> serializer = IRegistry.RECIPE_SERIALIZER.get(CraftNamespacedKey.toMinecraft(recipeSerializerKey));
-        return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), false);
+        return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), false, options);
     }
 
     public static RecipeShapelessToJson createVanillaShapelessRecipe(NamespacedKey key, org.bukkit.inventory.ItemStack result, int outputAmount,
-                                                    String group, Collection<org.bukkit.inventory.ItemStack> ingredients) {
+                                                    String group, Collection<org.bukkit.inventory.ItemStack> ingredients, List<Options> options) {
         List<ItemStack> recipeItemStacks = ingredients.stream().map(CraftItemStack::asNMSCopy).collect(Collectors.toList());
 
         ItemStack nmsResult = CraftItemStack.asNMSCopy(result);
-        return new RecipeShapelessToJson(CraftNamespacedKey.toMinecraft(key), nmsResult, group, recipeItemStacks, true);
+        return new RecipeShapelessToJson(CraftNamespacedKey.toMinecraft(key), nmsResult, group, recipeItemStacks, true, options);
     }
 
-    public static SingleItemRecipeToJson createVanillaCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, int outputCount) {
+    public static SingleItemRecipeToJson createVanillaCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, int outputCount, List<Options> options) {
         RecipeSerializer<RecipeStonecutting> serializer = RecipeSerializer.t;
         return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group,
-                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), true);
+                CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), true, options);
     }
 
-    public static SingleItemRecipeToJson createCustomCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output) {
+    public static SingleItemRecipeToJson createCustomCuttingRecipe(NamespacedKey key, String group, org.bukkit.inventory.ItemStack input, org.bukkit.inventory.ItemStack output, List<Options> options) {
         RecipeSerializer<InternalRecipeStonecutting> serializer = CraftingRegistry.STONECUTTING_SERIALIZER;
-        return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), false);
+        return new SingleItemRecipeToJson(CraftNamespacedKey.toMinecraft(key), serializer, group, CraftItemStack.asNMSCopy(input), CraftItemStack.asNMSCopy(output), false, options);
     }
 
 }

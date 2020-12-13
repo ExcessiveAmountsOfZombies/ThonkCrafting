@@ -6,19 +6,21 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 
-public class MenuDefaults {
 
-   /* public static MenuButton[] createBorder(Material borderMaterial, int rows) {
+public class MenuDefaults<C> {
+
+    public static ArrayList<Integer> acceptableSlots(int rows) {
         int size = rows * 9;
-        ArrayList<MenuButton> buttons = new ArrayList<>();
+        ArrayList<Integer> slots = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            if ((((i / 9 == 0) || i / 9 == rows - 1)) || ((i % 9) == 8 || i % 9 == 0)) {
-                buttons.add(new MenuButton(event -> event.setCancelled(true), i, new ItemStack(borderMaterial)));
+            if (!((((i / 9 == 0) || i / 9 == rows - 1)) || ((i % 9) == 8 || i % 9 == 0))) {
+               slots.add(i);
             }
         }
-        return buttons.toArray(new MenuButton[]{});
-    }*/
+        return slots;
+    }
 
     public static MenuButton closeButton(Material material, int slot) {
         return closeButton(new ItemStack(material), slot);
@@ -41,4 +43,14 @@ public class MenuDefaults {
             event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
         }, itemStack);
     }
+
+
+    /*public static Menu createPaginatedMenu(int rows, String menuName, int page, ArrayList<ContainerButton<?>> buttons) {
+        ArrayList<Integer> slots = acceptableSlots(rows);
+        Menu.Builder builder = new Menu.Builder(rows, menuName, true, Material.BLACK_STAINED_GLASS_PANE);
+        if (buttons.size() > slots.size()) {
+            // recurse?
+        }
+
+    }*/
 }

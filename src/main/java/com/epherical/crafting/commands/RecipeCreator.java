@@ -37,7 +37,7 @@ public class RecipeCreator implements CommandExecutor, TabCompleter {
                     vanillaRecipe = true;
                 }
                 CraftingRegistry.RecipeType type = CraftingRegistry.recipeTypeMap.get(recipeSerializer);
-                CraftingRegistry.serializingMenuMaps.get(recipeSerializer).create("Recipe Creator", recipeKey, "custom", type, vanillaRecipe, recipeSerializerKey, player).openInventory(player);
+                CraftingRegistry.serializingMenuMaps.get(recipeSerializer).create("Recipe Creator", recipeKey, "custom", type, vanillaRecipe, recipeSerializerKey, player, new ArrayList<>()).openInventory(player);
 
             } else {
                 player.sendMessage("Could not create the recipe as the key used was invalid.");

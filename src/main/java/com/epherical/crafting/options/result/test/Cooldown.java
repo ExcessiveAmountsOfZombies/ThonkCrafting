@@ -40,4 +40,10 @@ public class Cooldown extends TestOptions {
         builder.append(String.valueOf(delayInSeconds)).color(ChatColor.GRAY).italic(false);
         return builder.create();
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        super.serialize(object);
+        object.addProperty("cooldown-in-seconds", delayInSeconds);
+    }
 }

@@ -16,6 +16,7 @@ import org.bukkit.NamespacedKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OptionRegister {
@@ -50,7 +51,17 @@ public class OptionRegister {
         return option;
     }
 
+    public static void serializeOptions(JsonObject object, List<Options> options) {
+        JsonArray optionArray = new JsonArray();
 
+        options.forEach(options1 -> {
+            JsonObject optionObject = new JsonObject();
+            options1.serialize(optionObject);
+            optionArray.add(optionObject);
+        });
+
+        object.add("options", optionArray);
+    }
 
 
     public static ArrayList<Options> getOptions(JsonObject object) {

@@ -52,4 +52,12 @@ public class BiomeCheck extends TestOptions {
         }
         return builder.create();
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        super.serialize(object);
+        JsonArray array = new JsonArray();
+        biomes.forEach(array::add);
+        object.add("biomes", array);
+    }
 }

@@ -44,4 +44,11 @@ public class ApplyPotion extends SuccessOptions {
                 .append(String.valueOf(amplifier)).color(ChatColor.DARK_GRAY).bold(true)
                 .create();
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        object.addProperty("potion-effect", type.getName());
+        object.addProperty("length-in-ticks", lengthInTicks);
+        object.addProperty("amplifier", amplifier);
+    }
 }

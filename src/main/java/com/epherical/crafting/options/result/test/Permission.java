@@ -39,4 +39,10 @@ public class Permission extends TestOptions {
         builder.append(permissionNode).color(ChatColor.GRAY).italic(false);
         return builder.create();
     }
+
+    @Override
+    public void serialize(JsonObject object) {
+        super.serialize(object);
+        object.addProperty("permission", permissionNode);
+    }
 }
