@@ -2,6 +2,7 @@ package com.epherical.crafting.commands;
 
 import com.epherical.crafting.CraftingRegistry;
 import com.epherical.crafting.ThonkCrafting;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -40,7 +41,7 @@ public class RecipeCreator implements CommandExecutor, TabCompleter {
                 CraftingRegistry.serializingMenuMaps.get(recipeSerializer).create("Recipe Creator", recipeKey, "custom", type, vanillaRecipe, recipeSerializerKey, player, new ArrayList<>()).openInventory(player);
 
             } else {
-                player.sendMessage("Could not create the recipe as the key used was invalid.");
+                player.sendMessage(ChatColor.RED + "Could not create the recipe as the key used was invalid.");
             }
         }
 

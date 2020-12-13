@@ -335,14 +335,14 @@ public class RecipeMenus {
                 event.setCancelled(true);
                 Menu menu = (Menu) event.getInventory().getHolder();
                 ContainerButton<Number> button = (ContainerButton<Number>) menu.getConsumableSlots().get(event.getRawSlot());
-                addResponseRequest(event, menu, button);
+                addResponseRequest(event, menu, button, "number");
             }, ItemUtil.createContainerItem(Material.EXPERIENCE_BOTTLE, "", ChatColor.GRAY + "Experience per cooking iteration: " + exp), exp);
 
             ContainerButton<Number> timeButton = new ContainerButton<>(event -> {
                 event.setCancelled(true);
                 Menu menu = (Menu) event.getInventory().getHolder();
                 ContainerButton<Number> button = (ContainerButton<Number>) menu.getConsumableSlots().get(event.getRawSlot());
-                addResponseRequest(event, menu, button);
+                addResponseRequest(event, menu, button, "number");
             }, ItemUtil.createContainerItem( Material.LAVA_BUCKET,"", ChatColor.GRAY + "Time to cook: " + cookingTime), cookingTime);
 
 
@@ -362,13 +362,15 @@ public class RecipeMenus {
         }, itemStack);
     }
 
-    private static void addResponseRequest(InventoryClickEvent event, Menu menu, ContainerButton<?> button) {
+    private static void addResponseRequest(InventoryClickEvent event, Menu menu, ContainerButton<?> button, String type) {
         ThonkCrafting.getInstance().getChatListener().addResponseRequest(event.getWhoClicked().getUniqueId(), button);
 
         ChatListener listener = ThonkCrafting.getInstance().getChatListener();
 
         listener.addResponseRequest(event.getWhoClicked().getUniqueId(), button);
         listener.addSavedMenu(event.getWhoClicked().getUniqueId(), menu);
+
+        event.getWhoClicked().sendMessage("Enter in chat a(n): " + type);
 
         event.getWhoClicked().closeInventory(InventoryCloseEvent.Reason.PLUGIN);
     }

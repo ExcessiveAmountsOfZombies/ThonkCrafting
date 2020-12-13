@@ -14,3 +14,10 @@ commands:
     usage: Used to create a recipe.
   remove:
     usage: Remove a recipe so it can't be crafted.
+permissions:
+  thonkcrafting.view.allrecipes:
+    description: Players with this permission will be able to view any recipe that exists on the server, even if they haven't discovered it yet.
+    default: op
+  thonkcrafting.edit.recipe:
+    default: op
+    description: Players with this permission can edit a recipe.

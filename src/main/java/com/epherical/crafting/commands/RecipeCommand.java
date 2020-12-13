@@ -3,6 +3,7 @@ package com.epherical.crafting.commands;
 import com.epherical.crafting.ThonkCrafting;
 import com.epherical.crafting.gui.RecipeMenus;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -39,35 +40,38 @@ public class RecipeCommand implements CommandExecutor, TabCompleter {
                     if (keySet.contains(key)) {
                         recipe = Bukkit.getRecipe(key);
                     } else {
-                        player.sendMessage("You have not discovered that recipe yet, so you can't view it.");
+                        player.sendMessage(ChatColor.RED + "You have not discovered that recipe yet, so you can't view it.");
+                        return true;
                     }
                 }
 
 
                 if (recipe == null) {
-                    return false;
+                    return true;
                 }
 
                 boolean editRecipe = false;
                 boolean convertToThonkCraftingRecipe = false;
-                if (args.length > 1 && player.hasPermission("thonkcrafting.edit.recipe")) {
-                    if (args[1].equalsIgnoreCase("edit")) {
-                        editRecipe = true;
-                    } else {
-                        editRecipe = Boolean.parseBoolean(args[1]);
-                    }
-                } else {
-                    player.sendMessage("You do not have permission to edit the recipe!");
-                }
 
-                if (args.length > 2 && player.hasPermission("thonkcrafting.edit.recipe")) {
-                    if (args[2].equalsIgnoreCase("convert")) {
-                        convertToThonkCraftingRecipe = true;
-                    } else {
-                        convertToThonkCraftingRecipe = Boolean.parseBoolean(args[2]);
+                if (player.hasPermission("thonkcrafting.edit.recipe")) {
+                    if (args.length > 1) {
+                        if (args[1].equalsIgnoreCase("edit")) {
+                            editRecipe = true;
+                        } else {
+                            editRecipe = Boolean.parseBoolean(args[1]);
+                        }
+                    }
+
+                    if (args.length > 2) {
+                        if (args[2].equalsIgnoreCase("convert")) {
+                            convertToThonkCraftingRecipe = true;
+                        } else {
+                            convertToThonkCraftingRecipe = Boolean.parseBoolean(args[2]);
+                        }
                     }
                 } else {
-                    player.sendMessage("You do not have permission to convert the recipe!");
+                    player.sendMessage(ChatColor.RED + "You do not have permission to edit the recipe!");
+                    return true;
                 }
 
                 new RecipeMenus(recipe, commandSender, editRecipe, convertToThonkCraftingRecipe);
