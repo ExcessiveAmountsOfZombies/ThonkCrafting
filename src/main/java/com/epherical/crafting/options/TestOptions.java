@@ -1,13 +1,16 @@
 package com.epherical.crafting.options;
 
+import com.epherical.crafting.util.JsonUtil;
 import com.google.gson.JsonObject;
+import org.bukkit.NamespacedKey;
 
 public abstract class TestOptions extends Options {
 
-    private String failMessage;
+    private final String failMessage;
 
-    public TestOptions(String failMessage) {
-        this.failMessage = failMessage;
+    public TestOptions(NamespacedKey key, JsonObject object) {
+        super(key);
+        this.failMessage = JsonUtil.getValue(object, "fail-message").getAsString();
     }
 
     public abstract boolean test(OptionContext context);

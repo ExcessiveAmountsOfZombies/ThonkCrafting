@@ -13,13 +13,8 @@ public class WorldCheck extends TestOptions {
 
     private final String world;
 
-    public WorldCheck(String failMessage, String world) {
-        super(failMessage);
-        this.world = world;
-    }
-
     public WorldCheck(NamespacedKey key, JsonObject object) {
-        super(JsonUtil.getValue(object, "fail-message").getAsString());
+        super(key, object);
         this.world = JsonUtil.getValue(object, "world-to-check").getAsString();
     }
 

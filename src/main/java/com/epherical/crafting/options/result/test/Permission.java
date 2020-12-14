@@ -11,15 +11,11 @@ import org.bukkit.NamespacedKey;
 
 
 public class Permission extends TestOptions {
+
     private final String permissionNode;
 
-    public Permission(String failMessage, String permissionNode) {
-        super(failMessage);
-        this.permissionNode = permissionNode;
-    }
-
     public Permission(NamespacedKey key, JsonObject object) {
-        super(JsonUtil.getValue(object, "fail-message").getAsString());
+        super(key, object);
         this.permissionNode = JsonUtil.getValue(object, "permission").getAsString();
     }
 

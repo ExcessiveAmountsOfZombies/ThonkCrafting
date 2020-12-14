@@ -17,13 +17,8 @@ public class ApplyPotion extends SuccessOptions {
     private final int lengthInTicks;
     private final int amplifier;
 
-    public ApplyPotion(String potionEffectName, int lengthInTicks, int amplifier) throws NullPointerException {
-        this.type = PotionEffectType.getByName(potionEffectName);
-        this.lengthInTicks = lengthInTicks;
-        this.amplifier = amplifier;
-    }
-
     public ApplyPotion(NamespacedKey key, JsonObject object) {
+        super(key);
         this.type = PotionEffectType.getByName(JsonUtil.getValue(object, "potion-effect").getAsString());
         this.lengthInTicks = JsonUtil.getValue(object, "length-in-ticks").getAsInt();
         this.amplifier = JsonUtil.getValue(object, "amplifier").getAsInt();
@@ -47,6 +42,7 @@ public class ApplyPotion extends SuccessOptions {
 
     @Override
     public void serialize(JsonObject object) {
+        super.serialize(object);
         object.addProperty("potion-effect", type.getName());
         object.addProperty("length-in-ticks", lengthInTicks);
         object.addProperty("amplifier", amplifier);

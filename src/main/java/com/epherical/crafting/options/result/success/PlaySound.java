@@ -13,13 +13,8 @@ public class PlaySound extends SuccessOptions {
     private final float volume;
     private final float pitch;
 
-    public PlaySound(String sound, float volume, float pitch) {
-        this.sound = sound;
-        this.volume = volume;
-        this.pitch = pitch;
-    }
-
     public PlaySound(NamespacedKey key, JsonObject object) {
+        super(key);
         this.sound = JsonUtil.getValue(object, "sound").getAsString();
         this.volume = JsonUtil.getValue(object, "volume").getAsFloat();
         this.pitch = JsonUtil.getValue(object, "pitch").getAsFloat();
@@ -38,6 +33,7 @@ public class PlaySound extends SuccessOptions {
 
     @Override
     public void serialize(JsonObject object) {
+        super.serialize(object);
         object.addProperty("sound", sound);
         object.addProperty("volume", volume);
         object.addProperty("pitch", pitch);

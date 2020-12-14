@@ -13,13 +13,8 @@ public class Cooldown extends TestOptions {
 
     private final long delayInSeconds;
 
-    public Cooldown(String failMessage, long delayInSeconds) {
-        super(failMessage);
-        this.delayInSeconds = delayInSeconds;
-    }
-
     public Cooldown(NamespacedKey key, JsonObject object) {
-        super(JsonUtil.getValue(object, "fail-message").getAsString());
+        super(key, object);
         this.delayInSeconds = JsonUtil.getValue(object, "cooldown-in-seconds").getAsLong();
     }
 
